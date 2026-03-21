@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  nanobot-api:
+    build:
+      context: ..
+      dockerfile: http_api/Dockerfile
+    container_name: nanobot-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      # NanoBOT Configuration
+      - NANOBOT_CONFIG=/app/config.yaml
+      - NANOBOT_WORKSPACE=/app/workspace
+      # API Configuration
+      - API_PORT=8000
+      - DEBUG=${DEBUG:-false}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      # API Authentication (REQUIRED)
+      - NANOBOT_API_KEY=${NANOBOT_API_KEY}
+      # Provider Configuration (optional if in config.yaml)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    volumes:
+      # Persist sessions and workspace data
+      - ./workspace:/app/workspace
+      # Mount config file
+      - ./config.yaml:/app/config.yaml:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - nanobot-network
+
+networks:
+  nanobot-network:
+    driver: bridge

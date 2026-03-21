@@ -1,0 +1,58 @@
+# NanoBOT Configuration for HTTP API with OpenRouter Free Models
+# Generated: 2026-03-21
+
+agents:
+  defaults:
+    workspace: /root/.openclaw/workspace/nanobot/workspace
+    provider: openrouter
+    model: openrouter/stepfun/step-3.5-flash:free
+    max_tokens: 4096
+    context_window_tokens: 16384
+    temperature: 0.7
+    max_tool_iterations: 20
+    reasoning_effort: medium
+
+providers:
+  openrouter:
+    api_key: ${OPENROUTER_API_KEY}
+    # Optional: extra headers for OpenRouter
+    extra_headers:
+      HTTP-Referer: https://nanobot.local
+      X-Title: NanoBOT HTTP API
+
+gateway:
+  host: 0.0.0.0
+  port: 18791
+
+tools:
+  restrict_to_workspace: true
+  exec:
+    enabled: true
+    timeout: 30
+  web:
+    enabled: true
+    timeout: 10
+    proxy: null
+  filesystem:
+    enabled: true
+    restrict_to_workspace: true
+
+channels:
+  http:
+    enabled: true
+  cli:
+    enabled: false
+  telegram:
+    enabled: false
+  discord:
+    enabled: false
+  slack:
+    enabled: false
+
+heartbeat:
+  enabled: true
+  interval_s: 300
+
+logging:
+  level: INFO
+  format: json

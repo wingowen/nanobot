@@ -92,6 +92,16 @@ class LiteLLMProvider(LLMProvider):
         """Resolve model name by applying provider/gateway prefixes."""
         if self._gateway:
             prefix = self._gateway.litellm_prefix
+
+            # OpenRouter special-case:
+            # - keep explicit provider model ids as-is (e.g. openrouter/anthropic/..., openrouter/stepfun/...)
+            # - map legacy openrouter/free to openrouter/auto
+            if (self._gateway.name == "openrouter"):
+                if model == "openrouter/free":
+                    return "openrouter/auto"
+                if model.startswith("openrouter/"):
+                    return model
+
             if self._gateway.strip_model_prefix:
                 model = model.split("/")[-1]
             if prefix:
@@ -338,8 +348,43 @@ class LiteLLMProvider(LLMProvider):
                 "total_tokens": response.usage.total_tokens,
             }
 
-        reasoning_content = getattr(message, "reasoning_content", None) or None
+        reasoning_content = (
+            getattr(message, "reasoning_content", None)
+            or getattr(message, "reasoning", None)
+            or None
+        )
         thinking_blocks = getattr(message, "thinking_blocks", None) or None
+
+        # Fallback for providers that return empty content but include reasoning fields
+        # (seen on some StepFun/OpenRouter responses).
+        if (content is None or content == ""):
+            logger.debug("Empty content from provider; message keys={} choice keys={}",
+                         list(getattr(message, "__dict__", {}).keys()),
+                         list(getattr(choice, "__dict__", {}).keys()))
+            reasoning_details = getattr(message, "reasoning_details", None) or []
+            detail_texts = []
+            for item in reasoning_details:
+                text = None
+                if isinstance(item, dict):
+                    text = item.get("text")
+                else:
+                    text = getattr(item, "text", None)
+                if isinstance(text, str) and text.strip():
+                    detail_texts.append(text.strip())
+
+            if detail_texts:
+                content = "\n".join(detail_texts)
+            elif isinstance(reasoning_content, str) and reasoning_content.strip():
+                content = reasoning_content.strip()
+            elif thinking_blocks:
+                tb_texts = []
+                for block in thinking_blocks:
+                    if isinstance(block, dict):
+                        text = block.get("text") or block.get("thinking")
+                        if isinstance(text, str) and text.strip():
+                            tb_texts.append(text.strip())
+                if tb_texts:
+                    content = "\n".join(tb_texts)
 
         return LLMResponse(
             content=content,

@@ -1,0 +1,33 @@
+# Dockerfile for NanoBOT HTTP API
+# 基于本地已有的 nanobot:web 镜像，避免从 Docker Hub 拉取
+
+FROM nanobot:web
+
+WORKDIR /app
+
+# 设置 PyPI 镜像加速（国内源）
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 复制 NanoBOT 核心代码覆盖基础镜像（用于热修复 provider 行为）
+COPY nanobot ./nanobot
+
+# 复制 HTTP API 代码（包含 requirements.txt）
+COPY http_api ./http_api
+
+# 安装 http_api 依赖 + 额外的 structlog
+RUN pip install --no-cache-dir \
+    -r http_api/requirements.txt \
+    structlog
+
+# 复制主项目配置文件（不包含 .env，运行时挂载）
+COPY config.yaml .
+
+# 暴露端口（HTTP API 使用 18791，与 web 的 5000 不同）
+EXPOSE 18791
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:18791/health || exit 1
+
+# 启动命令：HTTP API 服务
+CMD ["python", "-m", "uvicorn", "http_api.main:app", "--host", "0.0.0.0", "--port", "18791"]
