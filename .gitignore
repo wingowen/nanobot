@@ -16,6 +16,7 @@ build/
 *.pyzz
 .venv/
 venv/
+venv-http/
 __pycache__/
 poetry.lock
 .pytest_cache/
@@ -23,3 +24,5 @@ botpy.log
 nano.*.save
 .DS_Store
 uv.lock
+*.log
+workspace/sessions/*.jsonl

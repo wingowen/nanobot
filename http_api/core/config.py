@@ -79,7 +79,7 @@ class Settings(BaseSettings):
         return v
 
     class Config:
-        env_file = ".env"
+        env_file = "./http_api/.env"
         env_file_encoding = "utf-8"
         case_sensitive = False  # 环境变量不区分大小写（可选）
 

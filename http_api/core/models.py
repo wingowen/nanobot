@@ -98,6 +98,16 @@ class SessionInfo(BaseModel):
     updated_at: datetime
 
 
+class SessionDetail(BaseModel):
+    """会话详情"""
+    session_id: str
+    user_id: str
+    message_count: int
+    created_at: datetime
+    updated_at: datetime
+    messages: list[dict[str, Any]] = Field(default_factory=list)
+
+
 class ToolInfo(BaseModel):
     """工具信息"""
     name: str

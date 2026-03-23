@@ -5,7 +5,7 @@ from typing import Optional
 
 from nanobot.session.manager import SessionManager, Session
 
-from .models import SessionInfo
+from .models import SessionInfo, SessionDetail
 
 
 class SessionAdapter:
@@ -36,7 +36,7 @@ class SessionAdapter:
         if chat_id is None:
             chat_id = user_id
         session_key = f"{user_id}:{chat_id}"
-        session = self.session_mgr.sessions.get(session_key)
+        session = self.session_mgr.get_or_create(session_key)
         if session:
             session.clear()
             return True
@@ -45,7 +45,30 @@ class SessionAdapter:
     def list_sessions(self, user_id: Optional[str] = None) -> list[SessionInfo]:
         """列出所有会话"""
         sessions = []
-        for key, session in self.session_mgr.sessions.items():
+        session_list = self.session_mgr.list_sessions()
+        for s in session_list:
+            key = s.get("key", "")
             if user_id is None or key.startswith(f"{user_id}:"):
-                sessions.append(self.get_session_info(session))
+                session_obj = self.session_mgr.get_or_create(key)
+                sessions.append(SessionInfo(
+                    session_id=key,
+                    user_id=key.split(":")[0] if ":" in key else key,
+                    message_count=len(session_obj.messages),
+                    created_at=datetime.fromisoformat(s.get("created_at", "2020-01-01")) if s.get("created_at") else datetime.now(),
+                    updated_at=datetime.fromisoformat(s.get("updated_at", "2020-01-01")) if s.get("updated_at") else datetime.now()
+                ))
         return sessions
+
+    def get_session_detail(self, session_id: str) -> Optional[SessionDetail]:
+        """获取会话详情"""
+        session = self.session_mgr.get_or_create(session_id)
+        if not session:
+            return None
+        return SessionDetail(
+            session_id=session.key,
+            user_id=session.key.split(":")[0] if ":" in session.key else session.key,
+            message_count=len(session.messages),
+            created_at=session.created_at,
+            updated_at=session.updated_at,
+            messages=session.messages
+        )
