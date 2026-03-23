@@ -212,6 +212,38 @@ class SessionManager:
         """Remove a session from the in-memory cache."""
         self._cache.pop(key, None)
 
+    def delete(self, key: str) -> bool:
+        """
+        Delete a session.
+
+        Args:
+            key: Session key (usually channel:chat_id).
+
+        Returns:
+            True if deleted, False if not found.
+        """
+        self.invalidate(key)
+
+        path = self._get_session_path(key)
+        if path.exists():
+            try:
+                path.unlink()
+                return True
+            except Exception as e:
+                logger.warning("Failed to delete session {}: {}", key, e)
+                return False
+
+        legacy_path = self._get_legacy_session_path(key)
+        if legacy_path.exists():
+            try:
+                legacy_path.unlink()
+                return True
+            except Exception as e:
+                logger.warning("Failed to delete legacy session {}: {}", key, e)
+                return False
+
+        return False
+
     def list_sessions(self) -> list[dict[str, Any]]:
         """
         List all sessions.

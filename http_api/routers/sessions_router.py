@@ -72,8 +72,12 @@ async def delete_session(
     删除指定会话
     """
     try:
-        # TODO: 实现删除会话
+        deleted = adapter.delete_session(session_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Session not found")
         return {"session_id": session_id, "deleted": True}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"delete_session_error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

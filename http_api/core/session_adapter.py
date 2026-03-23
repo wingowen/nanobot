@@ -42,6 +42,10 @@ class SessionAdapter:
             return True
         return False
 
+    def delete_session(self, session_id: str) -> bool:
+        """删除会话"""
+        return self.session_mgr.delete(session_id)
+
     def list_sessions(self, user_id: Optional[str] = None) -> list[SessionInfo]:
         """列出所有会话"""
         sessions = []
