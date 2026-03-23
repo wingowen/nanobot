@@ -1,5 +1,6 @@
 """聊天路由 - 实现 OpenAI 兼容的聊天接口"""
 
+import asyncio
 import uuid
 from datetime import datetime
 from typing import Optional
@@ -123,47 +124,78 @@ async def chat_completions_stream(
     if request.stream is False:
         raise HTTPException(status_code=400, detail="This endpoint only supports stream=true")
 
+    queue: asyncio.Queue[str | None] = asyncio.Queue()
+    completion_id = f"chatcmpl-{uuid.uuid4().hex[:8]}"
+    created = int(datetime.utcnow().timestamp())
+
+    async def on_progress(content: str, *, tool_hint: bool = False) -> None:
+        stream_chunk = ChatCompletionStreamResponse(
+            id=completion_id,
+            object="chat.completion.chunk",
+            created=created,
+            model=request.model or get_settings().model,
+            choices=[
+                {
+                    "index": 0,
+                    "delta": {"content": content} if content else {},
+                    "finish_reason": None,
+                }
+            ]
+        )
+        await queue.put(stream_chunk.model_dump_json())
+
     async def event_generator():
         try:
-            # 取最后一条用户消息
             last_msg = request.messages[-1]
             content = last_msg.content
             session_key = f"openai:{request.session_id or uuid.uuid4().hex[:8]}"
-            
-            # 调用非流式，然后模拟流式输出
-            response_text = await agent.process_direct(
-                content=content,
-                session_key=session_key,
-                channel="http_api",
-                chat_id=session_key,
+
+            agent_task = asyncio.create_task(
+                agent.process_direct(
+                    content=content,
+                    session_key=session_key,
+                    channel="http_api",
+                    chat_id=session_key,
+                    on_progress=on_progress,
+                )
             )
 
-            # 模拟流式输出（每10个字符一块）
-            completion_id = f"chatcmpl-{uuid.uuid4().hex[:8]}"
-            created = int(datetime.utcnow().timestamp())
-            
-            chunks = [response_text[i:i+10] for i in range(0, len(response_text), 10)]
-            for i, chunk in enumerate(chunks):
-                is_last = (i == len(chunks) - 1)
-                finish_reason = "stop" if is_last else None
-                
-                stream_chunk = ChatCompletionStreamResponse(
-                    id=completion_id,
-                    object="chat.completion.chunk",
-                    created=created,
-                    model=request.model or get_settings().model,
-                    choices=[
-                        {
-                            "index": 0,
-                            "delta": {"content": chunk} if chunk else {},
-                            "finish_reason": finish_reason,
-                        }
-                    ]
-                )
-                yield f"data: {stream_chunk.model_dump_json()}\n\n"
-                
-                if is_last:
-                    yield "data: [DONE]\n\n"
+            while True:
+                try:
+                    chunk_json = await asyncio.wait_for(queue.get(), timeout=30.0)
+                    yield f"data: {chunk_json}\n\n"
+                except asyncio.TimeoutError:
+                    if agent_task.done():
+                        break
+                    continue
+                except asyncio.QueueEmpty:
+                    if agent_task.done():
+                        break
+                    await asyncio.sleep(0.1)
+                    continue
+
+            try:
+                await agent_task
+            except Exception as e:
+                logger.exception("agent_task_error")
+                yield f"data: {{'error': '{str(e)}'}}\n\n"
+                return
+
+            final_chunk = ChatCompletionStreamResponse(
+                id=completion_id,
+                object="chat.completion.chunk",
+                created=created,
+                model=request.model or get_settings().model,
+                choices=[
+                    {
+                        "index": 0,
+                        "delta": {},
+                        "finish_reason": "stop",
+                    }
+                ]
+            )
+            yield f"data: {final_chunk.model_dump_json()}\n\n"
+            yield "data: [DONE]\n\n"
 
         except Exception as e:
             logger.exception("stream_error")
