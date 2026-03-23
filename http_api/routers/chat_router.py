@@ -67,7 +67,8 @@ async def chat_completions(
         content = last_msg.content
         
         # 生成或使用 session_id
-        session_key = f"openai:{request.session_id or uuid.uuid4().hex[:8]}"
+        user = request.user or "api_user"
+        session_key = f"{user}:{request.session_id or uuid.uuid4().hex[:8]}"
         
         # 调用 AgentLoop.process_direct - 它自动处理会话历史
         response_text = await agent.process_direct(
@@ -148,7 +149,8 @@ async def chat_completions_stream(
         try:
             last_msg = request.messages[-1]
             content = last_msg.content
-            session_key = f"openai:{request.session_id or uuid.uuid4().hex[:8]}"
+            user = request.user or "api_user"
+            session_key = f"{user}:{request.session_id or uuid.uuid4().hex[:8]}"
 
             agent_task = asyncio.create_task(
                 agent.process_direct(
@@ -161,17 +163,14 @@ async def chat_completions_stream(
             )
 
             while True:
+                if agent_task.done():
+                    break
                 try:
-                    chunk_json = await asyncio.wait_for(queue.get(), timeout=30.0)
+                    chunk_json = await asyncio.wait_for(queue.get(), timeout=1.0)
                     yield f"data: {chunk_json}\n\n"
                 except asyncio.TimeoutError:
-                    if agent_task.done():
-                        break
                     continue
                 except asyncio.QueueEmpty:
-                    if agent_task.done():
-                        break
-                    await asyncio.sleep(0.1)
                     continue
 
             try:

@@ -34,14 +34,60 @@ def initialize_app():
     from .config import get_settings
     settings = get_settings()
 
-    # 初始化 Provider - 使用 HTTP API settings 作为主配置来源
-    # （避免误读 ~/.nanobot/config.json 的默认模型）
-    api_key = os.getenv("OPENROUTER_API_KEY") or settings.openrouter_api_key
-    api_base = os.getenv("OPENROUTER_BASE_URL") or settings.openrouter_base_url
+    # 尝试从 ~/.nanobot/config.json 读取默认模型配置作为 fallback
+    nanobot_config_path = Path.home() / ".nanobot" / "config.json"
+    nanobot_defaults = {}
+    nanobot_providers = {}
+    if nanobot_config_path.exists():
+        try:
+            import json
+            with open(nanobot_config_path) as f:
+                nanobot_data = json.load(f)
+            nanobot_defaults = nanobot_data.get("agents", {}).get("defaults", {})
+            nanobot_providers = nanobot_data.get("providers", {})
+        except Exception:
+            pass
+
+    # 获取 provider 名称
     provider_name = os.getenv("LLM_PROVIDER") or settings.llm_provider
+    
+    # 根据 provider 获取对应的 API Key
+    # 优先级: 环境变量 > .nanobot/config.json > settings
+    provider_api_key_map = {
+        "dashscope": "DASHSCOPE_API_KEY",
+        "openrouter": "OPENROUTER_API_KEY",
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "google": "GOOGLE_API_KEY",
+        "moonshot": "MOONSHOT_API_KEY",
+    }
+    
+    # provider 默认 base_url（如果为 None 则使用 litellm 默认）
+    provider_default_base_url = {
+        "dashscope": None,
+        "openrouter": "https://openrouter.ai/api/v1",
+        "openai": None,
+        "anthropic": None,
+        "google": None,
+        "moonshot": None,
+    }
+    
+    env_api_key = os.getenv(provider_api_key_map.get(provider_name, "OPENROUTER_API_KEY"))
+    
+    # 从 nanobot_providers 获取 API Key
+    provider_config = nanobot_providers.get(provider_name, {})
+    config_api_key = provider_config.get("apiKey")
+    config_api_base = provider_config.get("apiBase") or provider_default_base_url.get(provider_name)
+    
+    # 从 settings 获取 fallback
+    settings_api_key = settings.openrouter_api_key
+    
+    api_key = env_api_key or config_api_key or settings_api_key
+    env_base_url = os.getenv(f"{provider_name.upper()}_BASE_URL")
+    api_base = env_base_url or config_api_base or provider_default_base_url.get(provider_name)
 
     if not api_key:
-        raise RuntimeError("OPENROUTER_API_KEY not set (check .env or env vars)")
+        raise RuntimeError(f"{provider_api_key_map.get(provider_name, 'OPENROUTER_API_KEY')} not set (check .env or env vars)")
 
     _provider = LiteLLMProvider(
         api_key=api_key,
@@ -58,8 +104,33 @@ def initialize_app():
     ensure_dir(workspace)
     _session_mgr = SessionManager(workspace=workspace)
 
-    # 初始化 Agent
+    # 初始化 Agent - 优先级: 环境变量 > settings > ~/.nanobot/config.json
     model = os.getenv("MODEL") or settings.model
+    agent_provider = provider_name
+    
+    if not os.getenv("MODEL") and nanobot_defaults:
+        default_model = nanobot_defaults.get("model", "")
+        default_provider = nanobot_defaults.get("provider", provider_name)
+        if default_model:
+            # 根据 provider 添加前缀
+            if default_provider == "dashscope":
+                model = f"dashscope/{default_model}"
+            elif default_provider == "openrouter":
+                model = f"openrouter/{default_model}"
+            else:
+                model = default_model
+        agent_provider = default_provider
+        
+        # 如果 agent 的 provider 和初始 provider 不同，重新创建 provider
+        if agent_provider != provider_name:
+            agent_provider_config = nanobot_providers.get(agent_provider, {})
+            agent_api_key = os.getenv(provider_api_key_map.get(agent_provider, "OPENROUTER_API_KEY")) or agent_provider_config.get("apiKey") or api_key
+            _provider = LiteLLMProvider(
+                api_key=agent_api_key,
+                api_base=api_base,
+                default_model=model,
+                provider_name=agent_provider,
+            )
 
     _agent = AgentLoop(
         bus=_bus,

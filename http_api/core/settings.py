@@ -12,18 +12,26 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from .core.agent_wrapper import NanoBotAgent
-
 # 加载环境变量
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-@lru_cache()
-def get_agent() -> NanoBotAgent:
+def get_agent() -> "NanoBotAgent":
     """获取 Agent 单例"""
-    return NanoBotAgent()
+    from .agent_wrapper import NanoBotAgent
+    from .config import get_settings
+    
+    settings = get_settings()
+    
+    return NanoBotAgent(
+        provider=settings.llm_provider,
+        model=settings.model,
+        api_key=settings.openrouter_api_key,
+        base_url=settings.openrouter_base_url if settings.llm_provider == "openrouter" else None,
+        workspace=settings.nanobot_workspace,
+    )
 
 
 def verify_api_key(api_key: str) -> bool:

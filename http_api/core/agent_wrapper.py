@@ -199,7 +199,6 @@ class NanoBotAgent:
         sessions = self.session_mgr.list_sessions()
         result = []
         for session in sessions:
-            # 过滤用户
             if user_id and not session.key.startswith(f"http_api:{user_id}"):
                 continue
             result.append(
@@ -211,6 +210,7 @@ class NanoBotAgent:
                     updated_at=session.updated_at,
                 )
             )
+        result.sort(key=lambda x: x.updated_at, reverse=True)
         return result
 
     def clear_session(self, session_id: str) -> bool:

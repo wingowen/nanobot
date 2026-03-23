@@ -57,6 +57,7 @@ class SessionAdapter:
                     created_at=datetime.fromisoformat(s.get("created_at", "2020-01-01")) if s.get("created_at") else datetime.now(),
                     updated_at=datetime.fromisoformat(s.get("updated_at", "2020-01-01")) if s.get("updated_at") else datetime.now()
                 ))
+        sessions.sort(key=lambda x: x.updated_at, reverse=True)
         return sessions
 
     def get_session_detail(self, session_id: str) -> Optional[SessionDetail]:

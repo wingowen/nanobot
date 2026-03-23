@@ -1,8 +1,23 @@
 """HTTP API 配置"""
 
+import json
+import os
+from pathlib import Path
 from typing import Optional
 from pydantic_settings import BaseSettings
 from pydantic import Field, field_validator
+
+
+def load_nanobot_config() -> dict:
+    """加载 ~/.nanobot/config.json 配置"""
+    config_path = Path("/root/.nanobot/config.json")
+    if config_path.exists():
+        try:
+            with open(config_path) as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
 
 
 class Settings(BaseSettings):
@@ -24,7 +39,7 @@ class Settings(BaseSettings):
 
     # LLM 配置
     llm_provider: str = Field("openrouter", description="LLM 提供商")
-    openrouter_api_key: str = Field(..., description="OpenRouter API Key")
+    openrouter_api_key: Optional[str] = Field(None, description="OpenRouter API Key")
     openrouter_base_url: str = Field("https://openrouter.ai/api/v1", description="OpenRouter Base URL")
     model: str = Field("openrouter/stepfun/step-3.5-flash:free", description="默认模型")
 
@@ -45,6 +60,33 @@ class Settings(BaseSettings):
     # 日志
     log_level: str = Field("INFO", description="日志级别")
     log_format: Optional[str] = Field(None, description="LOG_FORMAT 别名")
+
+    def __init__(self, **kwargs):
+        # 加载 nanobot config.json
+        nanobot_config = load_nanobot_config()
+        
+        # 如果没有提供 openrouter_api_key，尝试从 config.json 获取
+        agents = nanobot_config.get("agents", {})
+        defaults = agents.get("defaults", {})
+        provider_name = defaults.get("provider", "dashscope")
+        providers = nanobot_config.get("providers", {})
+        provider_config = providers.get(provider_name, {})
+        
+        if not kwargs.get("openrouter_api_key"):
+            kwargs["openrouter_api_key"] = provider_config.get("apiKey")
+        
+        if not kwargs.get("model") or kwargs["model"] == "openrouter/stepfun/step-3.5-flash:free":
+            model = defaults.get("model", "")
+            if model:
+                if provider_name == "openrouter":
+                    kwargs["model"] = f"openrouter/{model}"
+                elif provider_name == "dashscope":
+                    kwargs["model"] = f"dashscope/{model}"
+        
+        if not kwargs.get("llm_provider"):
+            kwargs["llm_provider"] = provider_name
+        
+        super().__init__(**kwargs)
 
     @field_validator('port', mode='before')
     @classmethod
