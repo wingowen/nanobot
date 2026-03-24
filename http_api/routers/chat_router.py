@@ -298,6 +298,10 @@ async def cancel_task(
         sub_cancelled = await agent.subagents.cancel_by_session(session_key)
         total = cancelled + sub_cancelled
         
+        session = agent.sessions.get(session_key)
+        if session:
+            agent.sessions.save(session)
+        
         return {
             "cancelled": total,
             "session_key": session_key,
