@@ -82,6 +82,8 @@ class Settings(BaseSettings):
                     kwargs["model"] = f"openrouter/{model}"
                 elif provider_name == "dashscope":
                     kwargs["model"] = f"dashscope/{model}"
+                elif provider_name == "minimax":
+                    kwargs["model"] = f"minimax/{model}"
         
         if not kwargs.get("llm_provider"):
             kwargs["llm_provider"] = provider_name

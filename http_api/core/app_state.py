@@ -60,6 +60,7 @@ def initialize_app():
         "anthropic": "ANTHROPIC_API_KEY",
         "google": "GOOGLE_API_KEY",
         "moonshot": "MOONSHOT_API_KEY",
+        "minimax": "MINIMAX_API_KEY",
     }
     
     # provider 默认 base_url（如果为 None 则使用 litellm 默认）
@@ -70,6 +71,7 @@ def initialize_app():
         "anthropic": None,
         "google": None,
         "moonshot": None,
+        "minimax": None,
     }
     
     env_api_key = os.getenv(provider_api_key_map.get(provider_name, "OPENROUTER_API_KEY"))

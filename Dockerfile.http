@@ -1,33 +1,46 @@
-# Dockerfile for NanoBOT HTTP API
-# 基于本地已有的 nanobot:web 镜像，避免从 Docker Hub 拉取
+# Dockerfile for NanoBOT HTTP API (独立运行版本)
+# 无需依赖本地 nanobot:web 镜像，可直接从 Docker Hub 构建
 
-FROM nanobot:web
+FROM python:3.12-slim
 
 WORKDIR /app
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 # 设置 PyPI 镜像加速（国内源）
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
-# 复制 NanoBOT 核心代码覆盖基础镜像（用于热修复 provider 行为）
-COPY nanobot ./nanobot
+# 复制依赖文件
+COPY pyproject.toml .
+COPY uv.lock .
+COPY http_api/requirements.txt .
 
-# 复制 HTTP API 代码（包含 requirements.txt）
-COPY http_api ./http_api
-
-# 安装 http_api 依赖 + 额外的 structlog
-RUN pip install --no-cache-dir \
-    -r http_api/requirements.txt \
+# 安装主项目和 HTTP API 依赖
+RUN pip install --no-cache-dir -e . \
+    && pip install --no-cache-dir -r http_api/requirements.txt \
     structlog
 
-# 复制主项目配置文件（不包含 .env，运行时挂载）
+# 复制代码
+COPY nanobot ./nanobot
+COPY http_api ./http_api
 COPY config.yaml .
 
-# 暴露端口（HTTP API 使用 18791，与 web 的 5000 不同）
+# 复制 .env.example 为默认环境变量文件（运行时应挂载实际的 .env）
+COPY http_api/.env.example .env
+
+# 暴露端口
 EXPOSE 18791
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:18791/health || exit 1
 
-# 启动命令：HTTP API 服务
+# 启动命令：清除 ENTRYPOINT，独立运行
+ENTRYPOINT []
+
+# 使用 uvicorn 直接启动 HTTP API
 CMD ["python", "-m", "uvicorn", "http_api.main:app", "--host", "0.0.0.0", "--port", "18791"]
