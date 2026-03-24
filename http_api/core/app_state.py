@@ -140,6 +140,7 @@ def initialize_app():
         workspace=workspace,
         model=model,
         session_manager=_session_mgr,
+        mcp_servers=nanobot_config.get("tools", {}).get("mcpServers", {}),
     )
 
 

@@ -77,11 +77,15 @@ class Dependencies:
             from nanobot.utils.helpers import ensure_dir
             ensure_dir(workspace)
             
+            from nanobot.config.loader import load_config
+            config = load_config()
+            
             self._agent = AgentLoop(
                 bus=bus,
                 provider=provider,
                 workspace=workspace,
                 session_manager=session_mgr,
+                mcp_servers=config.tools.mcp_servers or {},
             )
         return self._agent
     

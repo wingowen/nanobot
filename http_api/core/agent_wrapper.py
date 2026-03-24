@@ -65,6 +65,15 @@ class NanoBotAgent:
         # 3. 创建 SessionManager（内存模式）
         self.session_mgr = SessionManager(self.workspace)
 
+        # 加载 MCP 配置
+        mcp_servers = {}
+        try:
+            from nanobot.config.loader import load_config
+            config = load_config()
+            mcp_servers = config.tools.mcp_servers or {}
+        except Exception:
+            pass
+
         # 4. 创建 AgentLoop
         self.agent = AgentLoop(
             bus=self.bus,
@@ -72,6 +81,7 @@ class NanoBotAgent:
             workspace=self.workspace,
             model=self.model,
             session_manager=self.session_mgr,
+            mcp_servers=mcp_servers,
         )
 
     async def chat_simple(
