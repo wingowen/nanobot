@@ -161,6 +161,11 @@ async def chat_completions_stream(
                     on_progress=on_progress,
                 )
             )
+            agent._active_tasks.setdefault(session_key, []).append(agent_task)
+            agent_task.add_done_callback(
+                lambda t, k=session_key: agent._active_tasks.get(k, []) and agent._active_tasks[k].remove(t) 
+                if t in agent._active_tasks.get(k, []) else None
+            )
 
             while True:
                 if agent_task.done():
@@ -262,4 +267,42 @@ async def simple_chat(
         
     except Exception as e:
         logger.exception("simple_chat_error")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/tasks/{session_key}/cancel")
+async def cancel_task(
+    session_key: str,
+    agent: AgentLoop = Depends(get_agent),
+):
+    """
+    取消指定会话的活跃任务
+    
+    参数：
+    - session_key: 会话标识符（格式：user:session_id）
+    
+    返回：
+    - cancelled: 被取消的任务数量
+    - session_key: 会话标识
+    """
+    try:
+        tasks = agent._active_tasks.pop(session_key, [])
+        cancelled = sum(1 for t in tasks if not t.done() and t.cancel())
+        
+        for t in tasks:
+            try:
+                await t
+            except (asyncio.CancelledError, Exception):
+                pass
+        
+        sub_cancelled = await agent.subagents.cancel_by_session(session_key)
+        total = cancelled + sub_cancelled
+        
+        return {
+            "cancelled": total,
+            "session_key": session_key,
+            "message": f"Stopped {total} task(s)." if total else "No active task to stop."
+        }
+    except Exception as e:
+        logger.exception("cancel_task_error")
         raise HTTPException(status_code=500, detail=str(e))

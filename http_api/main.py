@@ -37,7 +37,7 @@ from .core.app_state import (
     initialize_app,
     shutdown_app,
 )
-from .routers import chat_router, sessions_router, tools_router, tasks_router
+from .routers import chat_router, sessions_router, tools_router
 
 # 初始化结构化日志
 structlog.configure(
@@ -108,12 +108,6 @@ app.include_router(
     tools_router.router,
     prefix="/v1",
     tags=["tools"],
-    dependencies=[Depends(verify_api_key)]
-)
-app.include_router(
-    tasks_router.router,
-    prefix="/v1",
-    tags=["tasks"],
     dependencies=[Depends(verify_api_key)]
 )
 
