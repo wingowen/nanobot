@@ -14,6 +14,56 @@ _agent: Optional[AgentLoop] = None
 _provider: Optional[LLMProvider] = None
 
 
+class MCPServerConfig:
+    """将字典格式的 MCP 配置转换为对象格式，兼容 nanobot 原有代码"""
+
+    def __init__(self, config: dict):
+        self._config = config
+
+    @property
+    def type(self) -> Optional[str]:
+        return self._config.get("type")
+
+    @property
+    def command(self) -> Optional[str]:
+        return self._config.get("command")
+
+    @property
+    def args(self) -> list:
+        return self._config.get("args", [])
+
+    @property
+    def env(self) -> Optional[dict]:
+        return self._config.get("env")
+
+    @property
+    def url(self) -> Optional[str]:
+        return self._config.get("url")
+
+    @property
+    def headers(self) -> Optional[dict]:
+        return self._config.get("headers")
+
+    @property
+    def enabled_tools(self) -> list:
+        return self._config.get("enabled_tools", ["*"])
+
+    @property
+    def tool_timeout(self) -> int:
+        return self._config.get("tool_timeout", 30)
+
+
+def _convert_mcp_servers(mcp_servers: dict) -> dict:
+    """将 MCP 配置从字典格式转换为对象格式"""
+    converted = {}
+    for name, config in mcp_servers.items():
+        if isinstance(config, dict):
+            converted[name] = MCPServerConfig(config)
+        else:
+            converted[name] = config
+    return converted
+
+
 def initialize_app():
     """初始化应用状态"""
     global _bus, _session_mgr, _agent, _provider
@@ -38,6 +88,7 @@ def initialize_app():
     nanobot_config_path = Path.home() / ".nanobot" / "config.json"
     nanobot_defaults = {}
     nanobot_providers = {}
+    nanobot_config = {}
     if nanobot_config_path.exists():
         try:
             import json
@@ -45,6 +96,7 @@ def initialize_app():
                 nanobot_data = json.load(f)
             nanobot_defaults = nanobot_data.get("agents", {}).get("defaults", {})
             nanobot_providers = nanobot_data.get("providers", {})
+            nanobot_config = nanobot_data
         except Exception:
             pass
 
@@ -140,7 +192,7 @@ def initialize_app():
         workspace=workspace,
         model=model,
         session_manager=_session_mgr,
-        mcp_servers=nanobot_config.get("tools", {}).get("mcpServers", {}),
+        mcp_servers=_convert_mcp_servers(nanobot_config.get("tools", {}).get("mcpServers", {})),
     )
 
 

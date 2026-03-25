@@ -29,3 +29,22 @@ services:
     command: ["status"]
     stdin_open: true
     tty: true
+
+  nanobot-web:
+    container_name: nanobot-web
+    image: nanobot-http-test:latest
+    restart: unless-stopped
+    ports:
+      - "18798:18792"
+      - "18799:18791"
+    volumes:
+      - ./http_api:/app/http_api
+      - ./workspace:/app/workspace
+      - ./.nanobot:/root/.nanobot
+    env_file:
+      - .env
+    command: >
+      bash -c "nohup nanobot gateway > /app/gateway.log 2>&1 &
+      echo 'Gateway started' &&
+      cd /app &&
+      exec python -m uvicorn http_api.main:app --host 0.0.0.0 --port 18792"
