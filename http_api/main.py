@@ -1,9 +1,6 @@
 """NanoBOT HTTP API - FastAPI 主应用"""
 
-import os
-import uuid
 from datetime import datetime
-from typing import Optional
 
 import structlog
 from fastapi import FastAPI, Depends, HTTPException, Header, WebSocket, WebSocketDisconnect
@@ -12,28 +9,8 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from fastapi import FastAPI, Depends, HTTPException, Header, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
-
-from .core.config import Settings
-from .core.models import (
-    ChatCompletionRequest,
-    ChatCompletionResponse,
-    ChatCompletionStreamResponse,
-    SimpleChatRequest,
-    SimpleResponse,
-    SessionInfo,
-    ToolInfo,
-    ErrorResponse,
-    ChatMessage,
-)
+from .core.config import get_settings
 from .core.app_state import (
-    get_agent,
-    get_bus,
-    get_session_manager,
     initialize_app,
     shutdown_app,
 )
@@ -49,7 +26,7 @@ structlog.configure(
 logger = structlog.get_logger()
 
 # 初始化 Settings
-settings = Settings()
+settings = get_settings()
 
 # 创建 FastAPI 应用
 app = FastAPI(
@@ -69,11 +46,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
-
-# 速率限制
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # 速率限制
 limiter = Limiter(key_func=get_remote_address)

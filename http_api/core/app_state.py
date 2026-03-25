@@ -1,5 +1,6 @@
 """应用状态管理 - 解决循环依赖"""
 
+import logging
 from typing import Optional
 
 from nanobot.agent.loop import AgentLoop
@@ -12,6 +13,7 @@ _bus: Optional[MessageBus] = None
 _session_mgr: Optional[SessionManager] = None
 _agent: Optional[AgentLoop] = None
 _provider: Optional[LLMProvider] = None
+logger = logging.getLogger(__name__)
 
 
 class MCPServerConfig:
@@ -74,12 +76,6 @@ def initialize_app():
     import os
     from pathlib import Path
 
-    # 加载 .env 文件（从项目根目录）
-    from dotenv import load_dotenv
-    project_root = Path(__file__).parent.parent.parent.parent
-    load_dotenv(project_root / ".env")
-    load_dotenv(project_root / ".env.api", override=True)
-
     # 懒加载配置
     from .config import get_settings
     settings = get_settings()
@@ -97,8 +93,8 @@ def initialize_app():
             nanobot_defaults = nanobot_data.get("agents", {}).get("defaults", {})
             nanobot_providers = nanobot_data.get("providers", {})
             nanobot_config = nanobot_data
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("failed to load nanobot config %s: %s", nanobot_config_path, exc)
 
     # 获取 provider 名称
     provider_name = os.getenv("LLM_PROVIDER") or settings.llm_provider
@@ -178,10 +174,21 @@ def initialize_app():
         # 如果 agent 的 provider 和初始 provider 不同，重新创建 provider
         if agent_provider != provider_name:
             agent_provider_config = nanobot_providers.get(agent_provider, {})
-            agent_api_key = os.getenv(provider_api_key_map.get(agent_provider, "OPENROUTER_API_KEY")) or agent_provider_config.get("apiKey") or api_key
+            agent_api_key = (
+                os.getenv(provider_api_key_map.get(agent_provider, "OPENROUTER_API_KEY"))
+                or agent_provider_config.get("apiKey")
+                or api_key
+            )
+            agent_env_base_url = os.getenv(f"{agent_provider.upper()}_BASE_URL")
+            agent_default_base_url = provider_default_base_url.get(agent_provider)
+            agent_api_base = (
+                agent_env_base_url
+                or agent_provider_config.get("apiBase")
+                or agent_default_base_url
+            )
             _provider = LiteLLMProvider(
                 api_key=agent_api_key,
-                api_base=api_base,
+                api_base=agent_api_base,
                 default_model=model,
                 provider_name=agent_provider,
             )

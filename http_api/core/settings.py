@@ -1,28 +1,20 @@
 """HTTP API 配置和依赖管理"""
 
-import os
-from functools import lru_cache
 from typing import AsyncGenerator
 
-from fastapi import HTTPException, Depends, Request
+from fastapi import HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# 加载环境变量
-from dotenv import load_dotenv
-
-load_dotenv()
+from .config import get_settings
 
 
 def get_agent() -> "NanoBotAgent":
     """获取 Agent 单例"""
     from .agent_wrapper import NanoBotAgent
-    from .config import get_settings
-    
     settings = get_settings()
     
     return NanoBotAgent(
@@ -36,13 +28,11 @@ def get_agent() -> "NanoBotAgent":
 
 def verify_api_key(api_key: str) -> bool:
     """验证 API Key"""
-    expected = os.getenv("API_KEY")
-    if not expected:
-        return True  # 如果没有配置 API_KEY，跳过验证
+    expected = get_settings().api_key
     return api_key == expected
 
 
-async def get_agent_dep() -> AsyncGenerator[NanoBotAgent, None]:
+async def get_agent_dep() -> AsyncGenerator["NanoBotAgent", None]:
     """FastAPI 依赖注入：获取 Agent"""
     agent = get_agent()
     try:
@@ -61,7 +51,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.clients: dict[str, list[float]] = {}
 
     async def dispatch(self, request: Request, call_next):
-        if not os.getenv("RATE_LIMIT_ENABLED", "false").lower() == "true":
+        settings = get_settings()
+        if not settings.rate_limit_enabled:
             return await call_next(request)
 
         client_ip = get_remote_address(request)
@@ -84,8 +75,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
 def setup_middlewares(app) -> None:
     """配置中间件"""
+    settings = get_settings()
+
     # CORS
-    origins = os.getenv("CORS_ORIGINS", "*").split(",")
+    origins = settings.cors_origins.split(",")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -98,12 +91,12 @@ def setup_middlewares(app) -> None:
     # app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1"])
 
     # 速率限制
-    if os.getenv("RATE_LIMIT_ENABLED", "false").lower() == "true":
+    if settings.rate_limit_enabled:
         limiter = Limiter(key_func=get_remote_address)
         app.state.limiter = limiter
         app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
         app.add_middleware(
             RateLimitMiddleware,
-            calls=int(os.getenv("RATE_LIMIT_REQUESTS", "100")),
-            period=int(os.getenv("RATE_LIMIT_WINDOW", "60")),
+            calls=settings.rate_limit_requests,
+            period=settings.rate_limit_window,
         )
