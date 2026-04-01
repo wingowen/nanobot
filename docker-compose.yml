@@ -38,6 +38,7 @@ services:
       - "18798:18792"
       - "18799:18791"
     volumes:
+      - ./nanobot:/app/nanobot
       - ./http_api:/app/http_api
       - ./workspace:/app/workspace
       - ./.nanobot:/root/.nanobot
