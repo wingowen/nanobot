@@ -404,7 +404,7 @@ class AgentLoop:
             session.clear()
             self.sessions.save(session)
             self.sessions.invalidate(session.key)
-
+            
             if snapshot:
                 self._schedule_background(self.memory_consolidator.archive_messages(snapshot))
 
@@ -503,6 +503,8 @@ class AgentLoop:
                     entry["content"] = filtered
             entry.setdefault("timestamp", datetime.now().isoformat())
             session.messages.append(entry)
+            # Archive message immediately for durability
+            self.sessions.archive_message(session, entry)
         session.updated_at = datetime.now()
 
     async def process_direct(

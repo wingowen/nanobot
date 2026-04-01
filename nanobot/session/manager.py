@@ -109,6 +109,7 @@ class SessionManager:
     def __init__(self, workspace: Path):
         self.workspace = workspace
         self.sessions_dir = ensure_dir(self.workspace / "sessions")
+        self.archive_dir = ensure_dir(self.workspace / "sessions_archive")
         self.legacy_sessions_dir = get_legacy_sessions_dir()
         self._cache: dict[str, Session] = {}
 
@@ -188,6 +189,13 @@ class SessionManager:
         except Exception as e:
             logger.warning("Failed to load session {}: {}", key, e)
             return None
+
+    def archive_message(self, session: Session, message: dict) -> None:
+        """Archive a single message to the archive file immediately."""
+        safe_key = safe_filename(session.key.replace(":", "_"))
+        archive_path = self.archive_dir / f"{safe_key}.jsonl"
+        with open(archive_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(message, ensure_ascii=False) + "\n")
 
     def save(self, session: Session) -> None:
         """Save a session to disk."""
