@@ -194,7 +194,7 @@ CMD ["uvicorn", "nanobot.http_api.main:app", "--host", "0.0.0.0", "--port", "187
 
 ```bash
 # 构建镜像
-docker build -f http_api/Dockerfile -t nanobot-http:latest .
+PH|docker build -f Dockerfile -t nanobot-http:latest .
 
 # 运行容器
 docker run -d \
@@ -212,7 +212,7 @@ services:
   nanobot-http:
     build:
       context: .
-      dockerfile: http_api/Dockerfile
+      XW|      dockerfile: Dockerfile
     ports:
       - "18791:18791"
     environment:
@@ -340,62 +340,29 @@ scrape_configs:
    WORKSPACE=/var/nanobot/workspace
    ```
 
-## 🧪 使用 Python 客户端
 
-```python
-from nanobot.http_api.clients.client import NanoBotClient
+YH|## 🛠️ 开发
+ZS|
+YJ|### 项目结构
+ZK|
+TV|```
+QY|nanobot/
+QM|├── http_api/
+WB|│   ├── main.py              # FastAPI 应用入口
+SV|│   ├── routers/
+QZ|│   │   └── chat_router.py   # 聊天路由
+MS|│   ├── core/
+XX|│   │   ├── models.py        # 请求/响应模型
+HQ|│   │   ├── agent_wrapper.py # NanoBOT 封装器
+NQ|│   │   └── settings.py      # 配置和中间件
+TR|│   ├── requirements.txt     # HTTP API 依赖
+VR|│   └── README.md            # 本文档
+WM|├── nanobot/                 # NanoBOT 核心
+SJ|├── .env                     # 环境变量配置
+SJ|└── pyproject.toml          # 项目配置
+VH|```
+JH|
 
-# 异步客户端
-async def example():
-    client = NanoBotClient(
-        base_url="https://api.yourdomain.com",
-        api_key="sk-nanobot-http-api-2026"
-    )
-
-    # 简单聊天
-    result = await client.chat("你好！", user_id="user123")
-    print(result["response"])
-
-    # OpenAI 兼容格式
-    completion = await client.chat_completion(
-        messages=[
-            {"role": "system", "content": "你是有用的助手"},
-            {"role": "user", "content": "介绍 FastAPI"},
-        ],
-        model="openrouter/anthropic/claude-3-haiku:free"
-    )
-    print(completion["choices"][0]["message"]["content"])
-
-    await client.close()
-
-# 同步客户端（便于脚本）
-sync_client = NanoBotClient(base_url="http://localhost:18791")
-result = sync_client.chat("你好！", user_id="test")
-print(result["response"])
-```
-
-## 🛠️ 开发
-
-### 项目结构
-
-```
-nanobot/
-├── http_api/
-│   ├── main.py              # FastAPI 应用入口
-│   ├── routers/
-│   │   └── chat.py          # 聊天路由
-│   ├── core/
-│   │   ├── models.py        # 请求/响应模型
-│   │   ├── agent_wrapper.py # NanoBOT 封装器
-│   │   └── settings.py      # 配置和中间件
-│   ├── clients/
-│   │   └── client.py        # Python 客户端
-│   ├── requirements.txt     # HTTP API 依赖
-│   └── README.md            # 本文档
-├── nanobot/                 # NanoBOT 核心
-├── .env                     # 环境变量配置
-└── pyproject.toml          # 项目配置
-```
 
 ### 调试
 
