@@ -401,6 +401,8 @@ class AgentLoop:
         cmd = msg.content.strip().lower()
         if cmd == "/new":
             snapshot = session.messages[session.last_consolidated:]
+            # Reset archive sync counter (session starts fresh)
+            session.metadata["_synced_to_archive"] = 0
             session.clear()
             self.sessions.save(session)
             self.sessions.invalidate(session.key)
@@ -454,8 +456,11 @@ class AgentLoop:
         if on_progress and final_content:
             await on_progress(final_content)
 
-        self._save_turn(session, all_msgs, 1 + len(history))
-        self.sessions.save(session)
+        try:
+            self._save_turn(session, all_msgs, 1 + len(history))
+            self.sessions.save(session)
+        except Exception:
+            logger.exception("Error saving session {}", session.key)
         self._schedule_background(self.memory_consolidator.maybe_consolidate_by_tokens(session))
 
         if (mt := self.tools.get("message")) and isinstance(mt, MessageTool) and mt._sent_in_turn:
@@ -503,8 +508,6 @@ class AgentLoop:
                     entry["content"] = filtered
             entry.setdefault("timestamp", datetime.now().isoformat())
             session.messages.append(entry)
-            # Archive message immediately for durability
-            self.sessions.archive_message(session, entry)
         session.updated_at = datetime.now()
 
     async def process_direct(

@@ -34,12 +34,7 @@ class Session:
 
     def add_message(self, role: str, content: str, **kwargs: Any) -> None:
         """Add a message to the session."""
-        msg = {
-            "role": role,
-            "content": content,
-            "timestamp": datetime.now().isoformat(),
-            **kwargs
-        }
+        msg = {"role": role, "content": content, "timestamp": datetime.now().isoformat(), **kwargs}
         self.messages.append(msg)
         self.updated_at = datetime.now()
 
@@ -59,7 +54,7 @@ class Session:
                 if tid and str(tid) not in declared:
                     start = i + 1
                     declared.clear()
-                    for prev in messages[start:i + 1]:
+                    for prev in messages[start : i + 1]:
                         if prev.get("role") == "assistant":
                             for tc in prev.get("tool_calls") or []:
                                 if isinstance(tc, dict) and tc.get("id"):
@@ -68,7 +63,7 @@ class Session:
 
     def get_history(self, max_messages: int = 500) -> list[dict[str, Any]]:
         """Return unconsolidated messages for LLM input, aligned to a legal tool-call boundary."""
-        unconsolidated = self.messages[self.last_consolidated:]
+        unconsolidated = self.messages[self.last_consolidated :]
         sliced = unconsolidated[-max_messages:]
 
         # Drop leading non-user messages to avoid starting mid-turn when possible.
@@ -117,6 +112,11 @@ class SessionManager:
         """Get the file path for a session."""
         safe_key = safe_filename(key.replace(":", "_"))
         return self.sessions_dir / f"{safe_key}.jsonl"
+
+    def _get_archive_path(self, key: str) -> Path:
+        """Get the archive file path for a session."""
+        safe_key = safe_filename(key.replace(":", "_"))
+        return self.archive_dir / f"{safe_key}.jsonl"
 
     def _get_legacy_session_path(self, key: str) -> Path:
         """Legacy global session path (~/.nanobot/sessions/)."""
@@ -174,7 +174,11 @@ class SessionManager:
 
                     if data.get("_type") == "metadata":
                         metadata = data.get("metadata", {})
-                        created_at = datetime.fromisoformat(data["created_at"]) if data.get("created_at") else None
+                        created_at = (
+                            datetime.fromisoformat(data["created_at"])
+                            if data.get("created_at")
+                            else None
+                        )
                         last_consolidated = data.get("last_consolidated", 0)
                     else:
                         messages.append(data)
@@ -184,23 +188,56 @@ class SessionManager:
                 messages=messages,
                 created_at=created_at or datetime.now(),
                 metadata=metadata,
-                last_consolidated=last_consolidated
+                last_consolidated=last_consolidated,
             )
         except Exception as e:
             logger.warning("Failed to load session {}: {}", key, e)
             return None
 
-    def archive_message(self, session: Session, message: dict) -> None:
-        """Archive a single message to the archive file immediately."""
-        safe_key = safe_filename(session.key.replace(":", "_"))
-        archive_path = self.archive_dir / f"{safe_key}.jsonl"
-        with open(archive_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(message, ensure_ascii=False) + "\n")
+    def _sync_to_archive(self, session: Session) -> None:
+        """Sync session content to archive file (append-only)."""
+        archive_path = self._get_archive_path(session.key)
+
+        # Use metadata counter if available (survives /new),
+        # otherwise fall back to archive line count (backward compat).
+        synced = session.metadata.get("_synced_to_archive")
+        if synced is not None:
+            new_messages = session.messages[synced:]
+        else:
+            archive_line_count = 0
+            if archive_path.exists():
+                try:
+                    with open(archive_path, encoding="utf-8") as f:
+                        archive_line_count = sum(1 for line in f if line.strip())
+                except Exception:
+                    archive_line_count = 0
+            # If archive has more lines than session (e.g. after /new without
+            # _synced_to_archive), treat all current session messages as new.
+            if archive_line_count > len(session.messages):
+                synced = 0
+            else:
+                synced = archive_line_count
+            new_messages = session.messages[synced:]
+
+        if not new_messages:
+            return
+
+        try:
+            with open(archive_path, "a", encoding="utf-8") as f:
+                for msg in new_messages:
+                    f.write(json.dumps(msg, ensure_ascii=False) + "\n")
+            session.metadata["_synced_to_archive"] = len(session.messages)
+            logger.debug("Synced {} messages to archive {}", len(new_messages), archive_path)
+        except Exception:
+            logger.exception("Failed to sync archive {}", archive_path)
 
     def save(self, session: Session) -> None:
-        """Save a session to disk."""
-        path = self._get_session_path(session.key)
+        """Save a session to disk and sync to archive."""
+        # Sync to archive before saving (archive is append-only)
+        self._sync_to_archive(session)
 
+        # Save session to disk
+        path = self._get_session_path(session.key)
         with open(path, "w", encoding="utf-8") as f:
             metadata_line = {
                 "_type": "metadata",
@@ -208,7 +245,7 @@ class SessionManager:
                 "created_at": session.created_at.isoformat(),
                 "updated_at": session.updated_at.isoformat(),
                 "metadata": session.metadata,
-                "last_consolidated": session.last_consolidated
+                "last_consolidated": session.last_consolidated,
             }
             f.write(json.dumps(metadata_line, ensure_ascii=False) + "\n")
             for msg in session.messages:
@@ -270,12 +307,14 @@ class SessionManager:
                         data = json.loads(first_line)
                         if data.get("_type") == "metadata":
                             key = data.get("key") or path.stem.replace("_", ":", 1)
-                            sessions.append({
-                                "key": key,
-                                "created_at": data.get("created_at"),
-                                "updated_at": data.get("updated_at"),
-                                "path": str(path)
-                            })
+                            sessions.append(
+                                {
+                                    "key": key,
+                                    "created_at": data.get("created_at"),
+                                    "updated_at": data.get("updated_at"),
+                                    "path": str(path),
+                                }
+                            )
             except Exception:
                 continue
 
