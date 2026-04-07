@@ -599,9 +599,15 @@ class AgentLoop:
         if final_content is None or not final_content.strip():
             final_content = EMPTY_FINAL_RESPONSE_MESSAGE
 
-        self._save_turn(session, all_msgs, 1 + len(history))
-        self._clear_runtime_checkpoint(session)
-        self.sessions.save(session)
+        if on_progress and final_content:
+            await on_progress(final_content)
+
+        try:
+            self._save_turn(session, all_msgs, 1 + len(history))
+            self._clear_runtime_checkpoint(session)
+            self.sessions.save(session)
+        except Exception:
+            logger.exception("Error saving session {}", session.key)
         self._schedule_background(self.consolidator.maybe_consolidate_by_tokens(session))
 
         if (mt := self.tools.get("message")) and isinstance(mt, MessageTool) and mt._sent_in_turn:
