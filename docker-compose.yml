@@ -64,8 +64,8 @@ services:
     volumes:
       - ./nanobot:/app/nanobot
       - ./http_api:/app/http_api
-      - ./workspace:/app/workspace
       - ./.nanobot:/root/.nanobot
+      - ./tests:/app/tests
     env_file:
       - .env
     command: bash -c "cd /app && nohup python -m nanobot gateway > /app/gateway.log 2>&1 & echo 'Gateway started' && exec python -m uvicorn http_api.main:app --host 0.0.0.0 --port 18792"
