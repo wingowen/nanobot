@@ -31,3 +31,4 @@ workspace/sessions/*.jsonl
 .nanobot/
 workspace/memory/HISTORY.md
 workspace/memory/MEMORY.md
+.nanobots/
