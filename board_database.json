@@ -1,0 +1,90 @@
+{
+  "parent": {
+    "type": "page_id",
+    "page_id": "2d867b21-8207-8001-9960-d1e98ae93d8b"
+  },
+  "title": [
+    {
+      "type": "text",
+      "text": {
+        "content": "总看板"
+      }
+    }
+  ],
+  "properties": {
+    "名称": {
+      "title": {}
+    },
+    "状态": {
+      "select": {
+        "options": [
+          {
+            "name": "待处理",
+            "color": "red"
+          },
+          {
+            "name": "进行中",
+            "color": "yellow"
+          },
+          {
+            "name": "已完成",
+            "color": "green"
+          },
+          {
+            "name": "已归档",
+            "color": "blue"
+          }
+        ]
+      }
+    },
+    "创建时间": {
+      "date": {}
+    },
+    "更新时间": {
+      "date": {}
+    },
+    "标签": {
+      "multi_select": {
+        "options": [
+          {
+            "name": "记忆系统",
+            "color": "purple"
+          },
+          {
+            "name": "文档",
+            "color": "gray"
+          },
+          {
+            "name": "技术",
+            "color": "blue"
+          },
+          {
+            "name": "任务",
+            "color": "orange"
+          }
+        ]
+      }
+    },
+    "优先级": {
+      "select": {
+        "options": [
+          {
+            "name": "高",
+            "color": "red"
+          },
+          {
+            "name": "中",
+            "color": "yellow"
+          },
+          {
+            "name": "低",
+            "color": "green"
+          }
+        ]
+      }
+    },
+    "负责人": {
+      "people": {}
+    }
+  }
+}

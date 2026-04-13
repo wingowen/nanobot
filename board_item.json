@@ -1,0 +1,84 @@
+{
+  "parent": {
+    "database_id": "979ce656-d1c6-401c-a321-5afa91509187"
+  },
+  "properties": {
+    "名称": {
+      "title": [
+        {
+          "type": "text",
+          "text": {
+            "content": "双层记忆系统与 Dream 管理知识文件"
+          }
+        }
+      ]
+    },
+    "状态": {
+      "select": {
+        "name": "已完成"
+      }
+    },
+    "创建时间": {
+      "date": {
+        "start": "2026-04-13"
+      }
+    },
+    "更新时间": {
+      "date": {
+        "start": "2026-04-13"
+      }
+    },
+    "标签": {
+      "multi_select": [
+        {
+          "name": "记忆系统"
+        },
+        {
+          "name": "文档"
+        },
+        {
+          "name": "技术"
+        }
+      ]
+    },
+    "优先级": {
+      "select": {
+        "name": "中"
+      }
+    }
+  },
+  "children": [
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "详细文档请访问：",
+              "link": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "https://www.notion.so/Dream-34167b21820781a2b581c43c0869baee",
+              "link": {
+                "url": "https://www.notion.so/Dream-34167b21820781a2b581c43c0869baee"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
