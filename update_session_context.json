@@ -1,0 +1,141 @@
+{
+  "properties": {
+    "名称": {
+      "title": [
+        {
+          "text": {
+            "content": "Session Context 影响技能选择的问题分析与解决方案"
+          }
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "object": "block",
+      "type": "heading_1",
+      "heading_1": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Session Context 影响技能选择的问题分析与解决方案"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "1. 问题描述"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "当用户询问一个问题时，大模型返回的 `reasoning_content` 显示，模型尝试使用 `web_search` 工具来获取金蝶和用友最近一周的新动向，但由于之前的 `web_search` 调用失败，模型仍然继续尝试使用相同的工具，而没有考虑其他可用的技能。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2. 根本原因分析"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "通过对代码库的分析，发现以下根本原因："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2.1 会话历史管理问题"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "失败记录持久化：工具调用失败的结果会被保存到会话历史中（`SessionManager` 类）"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "历史影响：模型在生成回复时会参考会话历史，导致重复尝试相同的失败方法"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "缺乏智能过滤：系统没有对失败的工具调用进行智能过滤或标记"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
