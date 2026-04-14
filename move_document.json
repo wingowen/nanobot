@@ -1,0 +1,51 @@
+{
+  "parent": {
+    "type": "database_id",
+    "database_id": "34167b21-8207-8125-88d2-fd24f1ed0c4d"
+  },
+  "properties": {
+    "title": {
+      "title": [
+        {
+          "type": "text",
+          "text": {
+            "content": "双层记忆系统与 Dream 管理知识文件的具体实现分析"
+          }
+        }
+      ]
+    },
+    "o=LE": {
+      "select": {
+        "name": "已完成"
+      }
+    },
+    "H~\\j": {
+      "date": {
+        "start": "2026-04-13"
+      }
+    },
+    "hRvH": {
+      "date": {
+        "start": "2026-04-13"
+      }
+    },
+    "~mzy": {
+      "multi_select": [
+        {
+          "name": "记忆系统"
+        },
+        {
+          "name": "文档"
+        },
+        {
+          "name": "技术"
+        }
+      ]
+    },
+    "Xn_x": {
+      "select": {
+        "name": "中"
+      }
+    }
+  }
+}

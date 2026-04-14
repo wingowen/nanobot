@@ -1,0 +1,979 @@
+{
+  "parent": {
+    "database_id": "34167b21-8207-8125-88d2-fd24f1ed0c4d"
+  },
+  "properties": {
+    "名称": {
+      "title": [
+        {
+          "type": "text",
+          "text": {
+            "content": "双层记忆系统与 Dream 管理知识文件的具体实现分析"
+          }
+        }
+      ]
+    },
+    "状态": {
+      "select": {
+        "name": "已完成"
+      }
+    },
+    "创建时间": {
+      "date": {
+        "start": "2026-04-13"
+      }
+    },
+    "更新时间": {
+      "date": {
+        "start": "2026-04-13"
+      }
+    },
+    "标签": {
+      "multi_select": [
+        {
+          "name": "记忆系统"
+        },
+        {
+          "name": "文档"
+        },
+        {
+          "name": "技术"
+        }
+      ]
+    },
+    "优先级": {
+      "select": {
+        "name": "中"
+      }
+    }
+  },
+  "children": [
+    {
+      "object": "block",
+      "type": "heading_1",
+      "heading_1": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "双层记忆系统与 Dream 管理知识文件的具体实现分析"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "1. 系统架构概览"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "nanobot 采用双层记忆系统，由短期记忆（会话消息）和长期记忆（知识文件）组成，通过 Consolidator 和 Dream 两个核心组件实现记忆的流动和管理。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2. 记忆文件结构"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "MEMORY.md: 系统级记忆，存储核心指令、配置和系统信息"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "SOUL.md: 灵魂文件，存储核心身份、价值观和长期目标"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "USER.md: 用户档案，存储用户相关信息和偏好"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "history.jsonl: 追加式历史总结，由 Consolidator 生成"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3. 记忆流通过程"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "1. 会话消息产生：用户与 nanobot 交互产生会话消息"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2. Consolidator 处理：轻量级压缩会话消息，生成历史总结并追加到 history.jsonl"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3. Dream 分析：定期或手动触发，分析 history.jsonl 与长期记忆文件的差异"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "4. Dream 编辑：根据分析结果，手术式编辑长期记忆文件"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "5. GitStore 版本控制：自动提交变更，记录记忆演化历史"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "4. Dream 实现详解"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "4.1 核心类结构"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "plain text",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "class MemoryStore:\n    # 处理记忆文件的读写操作\n    # 支持 MEMORY.md, SOUL.md, USER.md, history.jsonl\n\nclass Consolidator:\n    # 轻量级压缩会话消息\n    # 生成历史总结到 history.jsonl\n\nclass Dream:\n    # 管理长期记忆文件的更新\n    # 两阶段处理：分析和编辑"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "4.2 两阶段处理流程"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "第一阶段：分析差异"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "读取 history.jsonl 和长期记忆文件"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "分析历史信息与现有记忆的差异"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "识别需要更新的记忆内容"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "第二阶段：手术式编辑"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "根据分析结果生成编辑指令"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "执行精确的文件编辑操作"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "保持记忆的连贯性和结构完整性"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "5. 模板文件分析"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "5.1 dream_phase1.md - 分析阶段模板"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 引导 LLM 分析历史信息与现有记忆的差异"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 识别需要更新的关键信息"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 生成结构化的分析报告"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "5.2 dream_phase2.md - 编辑阶段模板"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 基于分析报告生成编辑指令"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 指导 LLM 执行手术式编辑"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 确保编辑后的记忆保持结构清晰"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "6. 配置与命令"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "6.1 配置项"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "plain text",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "memory:\n  dream:\n    enabled: true      # 是否启用 Dream\n    interval: 3600     # 自动触发间隔（秒）\n    max_history_lines: 1000  # 分析的历史行数"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "6.2 用户命令"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "/dream: 手动触发 Dream 处理"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "/memory: 查看当前记忆状态"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "7. 技术特性"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 分层记忆：短期会话与长期知识分离"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 智能分析：识别记忆差异和更新需求"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 手术式编辑：精确修改记忆文件，保持结构完整性"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 版本控制：GitStore 记录记忆演化历史"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "- 透明可控：用户可手动触发和查看记忆状态"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "8. 工作流程图"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "plain text",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐\n│ 会话消息        │     │ Consolidator   │     │ history.jsonl   │\n│ session.messages│────>│ 轻量级压缩     │────>│ 追加式历史总结  │\n└─────────────────┘     └─────────────────┘     └─────────────────┘\n                                                      │\n                                                      ▼\n┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐\n│ 长期记忆文件    │<────│ Dream          │<────│ 定时或手动触发  │\n│ SOUL.md         │     │ 两阶段处理     │     │ /dream 命令     │\n│ USER.md         │     │ 1. 分析差异    │     └─────────────────┘\n│ MEMORY.md       │     │ 2. 手术式编辑  │\n└─────────────────┘     └─────────────────┘\n        │                      │\n        ▼                      ▼\n┌─────────────────┐     ┌─────────────────┐\n│ GitStore        │<────│ 自动提交变更   │\n│ 版本控制        │     │ 记录变更历史   │\n└─────────────────┘     └─────────────────┘"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "9. 代码优化建议"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "错误处理增强："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "在 Dream 第二阶段中，增加对工具执行失败的更详细处理"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "考虑添加重试机制，提高编辑操作的可靠性"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "性能优化："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "对于大型历史文件，考虑使用流式读取方式，减少内存占用"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "可以添加缓存机制，避免重复读取相同的文件内容"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "可观测性："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "增加更详细的日志记录，特别是 Dream 处理过程中的关键步骤"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "考虑添加指标收集，监控 Dream 的执行时间和处理效率"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "扩展性："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "设计插件机制，允许自定义 Dream 的分析和编辑逻辑"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "考虑支持更多类型的记忆文件和处理策略"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "10. 总结"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "nanobot 的双层记忆系统通过 Consolidator 和 Dream 两个组件，实现了从短期会话到长期知识的自然流动。Dream 作为系统的核心，通过两阶段处理流程，智能分析历史信息并对长期记忆文件进行精确编辑，确保记忆的连贯性和准确性。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "这种设计不仅使记忆系统更加高效和可靠，还通过版本控制和用户命令，让记忆过程变得透明和可控，符合\"记忆应该感觉有生命力但不混乱\"的设计理念。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "通过这种分层设计和智能处理，nanobot 能够在保持对话流畅的同时，不断积累和整理知识，为用户提供更加个性化和连贯的交互体验。"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
