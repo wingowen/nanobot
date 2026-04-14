@@ -1,0 +1,1390 @@
+{
+  "parent": {
+    "database_id": "34167b21-8207-8125-88d2-fd24f1ed0c4d"
+  },
+  "properties": {
+    "名称": {
+      "title": [
+        {
+          "text": {
+            "content": "Memory in nanobot"
+          }
+        }
+      ]
+    },
+    "状态": {
+      "select": {
+        "name": "已完成"
+      }
+    },
+    "优先级": {
+      "select": {
+        "name": "高"
+      }
+    },
+    "创建时间": {
+      "date": {
+        "start": "2026-04-14"
+      }
+    },
+    "更新时间": {
+      "date": {
+        "start": "2026-04-14"
+      }
+    },
+    "标签": {
+      "multi_select": [
+        {
+          "name": "记忆系统"
+        },
+        {
+          "name": "文档"
+        },
+        {
+          "name": "技术"
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "type": "heading_1",
+      "heading_1": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Memory in nanobot"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Note: This design is currently an experiment in the latest source code version and is planned to officially ship in v0.1.5."
+            },
+            "annotations": {
+              "italic": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "nanobot's memory is built on a simple belief: memory should feel alive, but it should not feel chaotic."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Good memory is not a pile of notes. It is a quiet system of attention. It notices what is worth keeping, lets go of what no longer needs the spotlight, and turns lived experience into something calm, durable, and useful."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "That is the shape of memory in nanobot."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "The Design"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "nanobot does not treat memory as one giant file."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "It separates memory into layers, because different kinds of remembering deserve different tools:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "session.messages holds the living short-term conversation."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "memory/history.jsonl is the running archive of compressed past turns."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "SOUL.md, USER.md, and memory/MEMORY.md are the durable knowledge files."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "GitStore records how those durable files change over time."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This keeps the system light in the moment, but reflective over time."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "The Flow"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Memory moves through nanobot in two stages."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Stage 1: Consolidator"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "When a conversation grows large enough to pressure the context window, nanobot does not try to carry every old message forever."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Instead, the Consolidator summarizes the oldest safe slice of the conversation and appends that summary to memory/history.jsonl."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This file is:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "append-only"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "cursor-based"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "optimized for machine consumption first, human inspection second"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Each line is a JSON object:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "code",
+      "code": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": '{"cursor": 42, "timestamp": "2026-04-03 00:02", "content": "- User prefers dark mode\n- Decided to use PostgreSQL"}'
+            }
+          }
+        ],
+        "language": "json"
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "It is not the final memory. It is the material from which final memory is shaped."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Stage 2: Dream"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Dream is the slower, more thoughtful layer. It runs on a cron schedule by default and can also be triggered manually."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Dream reads:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "new entries from memory/history.jsonl"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "the current SOUL.md"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "the current USER.md"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "the current memory/MEMORY.md"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Then it works in two phases:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "It studies what is new and what is already known."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "It edits the long-term files surgically, not by rewriting everything, but by making the smallest honest change that keeps memory coherent."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This is why nanobot's memory is not just archival. It is interpretive."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "The Files"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "code",
+      "code": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "workspace/\n├── SOUL.md              # The bot's long-term voice and communication style\n├── USER.md              # Stable knowledge about the user\n└── memory/\n    ├── MEMORY.md        # Project facts, decisions, and durable context\n    ├── history.jsonl    # Append-only history summaries\n    ├── .cursor          # Consolidator write cursor\n    ├── .dream_cursor    # Dream consumption cursor\n    └── .git/            # Version history for long-term memory files"
+            }
+          }
+        ],
+        "language": "bash"
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "These files play different roles:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "SOUL.md remembers how nanobot should sound."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "USER.md remembers who the user is and what they prefer."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "MEMORY.md remembers what remains true about the work itself."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "history.jsonl remembers what happened on the way there."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Why history.jsonl"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "The old HISTORY.md format was pleasant for casual reading, but it was too fragile as an operational substrate."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "history.jsonl gives nanobot:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "stable incremental cursors"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "safer machine parsing"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "easier batching"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "cleaner migration and compaction"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "a better boundary between raw history and curated knowledge"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "You can still search it with familiar tools:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "code",
+      "code": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "# grep\ngrep -i \"keyword\" memory/history.jsonl\n\n# jq\ncat memory/history.jsonl | jq -r 'select(.content | test(\"keyword\"; \"i\")) | .content' | tail -20\n\n# Python\npython -c \"import json; [print(json.loads(l).get('content','')) for l in open('memory/history.jsonl','r',encoding='utf-8') if l.strip() and 'keyword' in l.lower()][-20:]\""
+            }
+          }
+        ],
+        "language": "bash"
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "The difference is philosophical as much as technical:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "history.jsonl is for structure"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "SOUL.md, USER.md, and MEMORY.md are for meaning"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Commands"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Memory is not hidden behind the curtain. Users can inspect and guide it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "table",
+      "table": {
+        "table_width": 2,
+        "has_column_header": true,
+        "has_row_header": false,
+        "rows": [
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Command"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "What it does"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "/dream"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Run Dream immediately"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "/dream-log"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Show the latest Dream memory change"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "/dream-log <sha>"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Show a specific Dream change"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "/dream-restore"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "List recent Dream memory versions"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "/dream-restore <sha>"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Restore memory to the state before a specific change"
+                  }
+                }
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "These commands exist for a reason: automatic memory is powerful, but users should always retain the right to inspect, understand, and restore it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Versioned Memory"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "After Dream changes long-term memory files, nanobot can record that change with GitStore."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "This gives memory a history of its own:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "you can inspect what changed"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "you can compare versions"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "you can restore a previous state"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "That turns memory from a silent mutation into an auditable process."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Configuration"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Dream is configured under agents.defaults.dream:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "code",
+      "code": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "{\n  \"agents\": {\n    \"defaults\": {\n      \"dream\": {\n        \"intervalH\": 2,\n        \"modelOverride\": null,\n        \"maxBatchSize\": 20,\n        \"maxIterations\": 10\n      }\n    }\n  }\n}"
+            }
+          }
+        ],
+        "language": "json"
+      }
+    },
+    {
+      "type": "table",
+      "table": {
+        "table_width": 2,
+        "has_column_header": true,
+        "has_row_header": false,
+        "rows": [
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Field"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Meaning"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "intervalH"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "How often Dream runs, in hours"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "modelOverride"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Optional Dream-specific model override"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "maxBatchSize"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "How many history entries Dream processes per run"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "cells": [
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "maxIterations"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "The tool budget for Dream's editing phase"
+                  }
+                }
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "In practical terms:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "modelOverride: null means Dream uses the same model as the main agent. Set it only if you want Dream to run on a different model."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "maxBatchSize controls how many new history.jsonl entries Dream consumes in one run. Larger batches catch up faster; smaller batches are lighter and steadier."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "maxIterations limits how many read/edit steps Dream can take while updating SOUL.md, USER.md, and MEMORY.md. It is a safety budget, not a quality score."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "intervalH is the normal way to configure Dream. Internally it runs as an every schedule, not as a cron expression."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Legacy note:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Older source-based configs may still contain dream.cron. nanobot continues to honor it for backward compatibility, but new configs should use intervalH."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Older source-based configs may still contain dream.model. nanobot continues to honor it for backward compatibility, but new configs should use modelOverride."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "In Practice"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "What this means in daily use is simple:"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "conversations can stay fast without carrying infinite context"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "durable facts can become clearer over time instead of noisier"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "the user can inspect and restore memory when needed"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Memory should not feel like a dump. It should feel like continuity."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "That is what this design is trying to protect."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
