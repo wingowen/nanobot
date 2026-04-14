@@ -1,0 +1,219 @@
+{
+  "parent": {
+    "database_id": "34167b21-8207-8125-88d2-fd24f1ed0c4d"
+  },
+  "properties": {
+    "名称": {
+      "title": [
+        {
+          "text": {
+            "content": "自定义 Slash 命令 Hook 设计方案"
+          }
+        }
+      ]
+    },
+    "状态": {
+      "select": {
+        "name": "已完成"
+      }
+    },
+    "优先级": {
+      "select": {
+        "name": "高"
+      }
+    },
+    "创建时间": {
+      "date": {
+        "start": "2026-04-14"
+      }
+    },
+    "更新时间": {
+      "date": {
+        "start": "2026-04-14"
+      }
+    },
+    "标签": {
+      "multi_select": [
+        {
+          "name": "Slash 命令"
+        },
+        {
+          "name": "Hook 系统"
+        },
+        {
+          "name": "扩展"
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "object": "block",
+      "type": "heading_1",
+      "heading_1": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "自定义 Slash 命令 Hook 设计方案"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "1. 问题分析"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "通过对项目代码的分析，发现当前项目存在以下问题："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "缺乏自定义 Slash 命令的扩展机制：当前的 slash 命令是硬编码在 command/builtin.py 中的，用户无法通过配置或插件的方式添加自定义命令。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Hook 系统不支持 Slash 命令：当前的 AgentHook 系统主要关注 agent 执行的生命周期，没有提供针对 slash 命令的特定 hook 点。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "命令路由硬编码：命令路由逻辑在 AgentLoop 初始化时硬编码注册，没有提供动态注册的机制。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2. 当前系统分析"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2.1 命令路由系统"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "当前的命令路由系统基于 CommandRouter 类，支持三种类型的命令："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "priority：优先级命令，在锁之外处理（如 /stop, /restart）"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "exact：精确匹配命令，在锁内处理"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "prefix：前缀匹配命令，按最长前缀优先"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
