@@ -1,0 +1,823 @@
+{
+  "parent": {
+    "database_id": "34167b21-8207-8125-88d2-fd24f1ed0c4d"
+  },
+  "properties": {
+    "名称": {
+      "title": [
+        {
+          "text": {
+            "content": "自定义 Slash 命令 Hook 设计方案"
+          }
+        }
+      ]
+    },
+    "状态": {
+      "select": {
+        "name": "已完成"
+      }
+    },
+    "优先级": {
+      "select": {
+        "name": "高"
+      }
+    },
+    "创建时间": {
+      "date": {
+        "start": "2026-04-15"
+      }
+    },
+    "更新时间": {
+      "date": {
+        "start": "2026-04-15"
+      }
+    },
+    "标签": {
+      "multi_select": [
+        {
+          "name": "Slash命令"
+        },
+        {
+          "name": "Hook"
+        },
+        {
+          "name": "设计"
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "object": "block",
+      "type": "heading_1",
+      "heading_1": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "自定义 Slash 命令 Hook 设计方案"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "1. 问题分析"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "通过对项目代码的分析，发现当前项目存在以下问题："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "缺乏自定义 Slash 命令的扩展机制：当前的 slash 命令是硬编码在 command/builtin.py 中的，用户无法通过配置或插件的方式添加自定义命令。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Hook 系统不支持 Slash 命令：当前的 AgentHook 系统主要关注 agent 执行的生命周期，没有提供针对 slash 命令的特定 hook 点。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "命令路由硬编码：命令路由逻辑在 AgentLoop 初始化时硬编码注册，没有提供动态注册的机制。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2. 当前系统分析"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2.1 命令路由系统"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "当前的命令路由系统基于 CommandRouter 类，支持三种类型的命令："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "priority：优先级命令，在锁之外处理（如 /stop, /restart）"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "exact：精确匹配命令，在锁内处理"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "prefix：前缀匹配命令，按最长前缀优先"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "interceptors：拦截器，作为最后的回退机制"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "命令注册通过 register_builtin_commands 函数硬编码注册到 CommandRouter 实例中。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2.2 Hook 系统"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "当前的 hook 系统基于 AgentHook 类，支持以下生命周期事件："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "wants_streaming：是否需要流式输出"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "before_iteration：每次迭代前"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "on_stream：流式输出时"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "on_stream_end：流式输出结束时"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "before_execute_tools：执行工具前"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "after_iteration：每次迭代后"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "finalize_content：最终内容处理"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2.3 执行流程"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "消息进入 AgentLoop._dispatch 方法"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "检查是否为优先级命令，若是则直接处理"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "否则创建任务执行 _process_message 方法"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "在 _process_message 方法中：检查是否为 slash 命令，若是则通过 commands.dispatch 处理；否则进行正常的 agent 处理流程"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3. 解决方案"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3.1 自定义 Slash 命令扩展机制"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_4",
+      "heading_4": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3.1.1 命令注册 API"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "添加一个公共 API 允许用户注册自定义 slash 命令："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "python",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "class AgentLoop:\n    def register_command(self, cmd: str, handler: Handler, type: str = \"exact\"):\n        \"\"\"Register a custom slash command.\n        \n        Args:\n            cmd: Command string (e.g. \"/mycommand\")\n            handler: Command handler function\n            type: Command type (\"priority\", \"exact\", \"prefix\")\n        \"\"\"\n        if type == \"priority\":\n            self.commands.priority(cmd, handler)\n        elif type == \"exact\":\n            self.commands.exact(cmd, handler)\n        elif type == \"prefix\":\n            self.commands.prefix(cmd, handler)"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_4",
+      "heading_4": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3.1.2 命令执行 Hook"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "扩展 AgentHook 类，添加针对 slash 命令的 hook 点："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "python",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "class AgentHook:\n    # 现有方法...\n    \n    async def before_command(self, ctx: CommandContext) -> OutboundMessage | None:\n        \"\"\"Called before executing a slash command.\n        \n        Return an OutboundMessage to bypass the command execution.\n        \"\"\"\n        return None\n    \n    async def after_command(self, ctx: CommandContext, result: OutboundMessage | None) -> OutboundMessage | None:\n        \"\"\"Called after executing a slash command.\n        \n        Can modify or replace the result.\n        \"\"\"\n        return result"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "4. 实现建议"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "4.1 命令注册机制"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "扩展 AgentLoop 类：添加 register_command 和 unregister_command 方法"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "修改 CommandRouter 类：添加 remove 方法支持命令注销"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "添加命令元数据：支持命令描述、权限等元数据"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "5. 测试策略"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "5.1 功能测试"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "测试自定义命令注册和执行"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "测试命令 hook 的调用"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "测试命令拦截器的功能"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "6. 预期效果"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "通过实施上述解决方案，预期可以："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "提高系统的可扩展性：允许用户通过多种方式添加自定义 slash 命令"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "增强系统的灵活性：通过 hook 机制允许用户自定义命令的行为"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "简化命令管理：通过配置和插件系统简化命令的注册和管理"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "保持向后兼容性：确保现有命令和系统不受影响"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "7. 结论"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "当前项目不支持自定义 slash 命令的 hook，但通过实施上述设计方案，可以为系统添加灵活的命令扩展机制。这将使 nanobot 更加可定制，能够更好地适应不同用户的需求。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "设计方案考虑了系统的现有架构，通过最小化的修改来实现功能扩展，同时保持系统的稳定性和可维护性。"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
