@@ -1,0 +1,421 @@
+{
+  "parent": {
+    "database_id": "34167b21-8207-8125-88d2-fd24f1ed0c4d"
+  },
+  "properties": {
+    "名称": {
+      "title": [
+        {
+          "text": {
+            "content": "系统提示词注入分析"
+          }
+        }
+      ]
+    },
+    "状态": {
+      "select": {
+        "name": "已完成"
+      }
+    },
+    "优先级": {
+      "select": {
+        "name": "高"
+      }
+    },
+    "创建时间": {
+      "date": {
+        "start": "2026-04-15"
+      }
+    },
+    "更新时间": {
+      "date": {
+        "start": "2026-04-15"
+      }
+    },
+    "标签": {
+      "multi_select": [
+        {
+          "name": "Nanobot"
+        },
+        {
+          "name": "提示词"
+        },
+        {
+          "name": "分析"
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "object": "block",
+      "type": "heading_1",
+      "heading_1": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "系统提示词注入分析"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "1. 概述"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "本文档详细分析了 nanobot 系统中注入的提示词（Prompts），包括硬编码的提示词和通过文件注入的提示词。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2. 通过文件注入的提示词"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2.1 核心引导文件（BOOTSTRAP_FILES）"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "这些文件在系统启动时被加载，构成了代理的基本指令集："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "markdown",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "| 文件名 | 路径 | 作用 |\n|--------|------|------|\n| AGENTS.md | nanobot/templates/AGENTS.md | 代理指令，包含提醒和心跳任务的使用指南 |\n| SOUL.md | nanobot/templates/SOUL.md | 定义代理的人格、价值观和沟通风格 |\n| USER.md | nanobot/templates/USER.md | 用户配置文件，包含用户基本信息和偏好设置 |\n| TOOLS.md | nanobot/templates/TOOLS.md | 工具使用说明和约束 |"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2.2 代理模板文件"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "这些文件定义了代理的身份和行为："
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "markdown",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "| 文件名 | 路径 | 作用 |\n|--------|------|------|\n| identity.md | nanobot/templates/agent/identity.md | 核心身份信息，包含运行时环境和工作空间信息 |\n| platform_policy.md | nanobot/templates/agent/platform_policy.md | 平台特定的政策和指导 |\n| skills_section.md | nanobot/templates/agent/skills_section.md | 技能部分的模板 |\n| consolidator_archive.md | nanobot/templates/agent/consolidator_archive.md | 整合器存档模板 |\n| dream_phase1.md | nanobot/templates/agent/dream_phase1.md | 梦想阶段1模板 |\n| dream_phase2.md | nanobot/templates/agent/dream_phase2.md | 梦想阶段2模板 |\n| evaluator.md | nanobot/templates/agent/evaluator.md | 评估器模板 |\n| max_iterations_message.md | nanobot/templates/agent/max_iterations_message.md | 最大迭代消息模板 |\n| subagent_announce.md | nanobot/templates/agent/subagent_announce.md | 子代理公告模板 |\n| subagent_system.md | nanobot/templates/agent/subagent_system.md | 子代理系统模板 |\n| untrusted_content.md | nanobot/templates/agent/_snippets/untrusted_content.md | 不可信内容处理指南 |"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "2.3 内存和心跳模板"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "markdown",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "| 文件名 | 路径 | 作用 |\n|--------|------|------|\n| MEMORY.md | nanobot/templates/memory/MEMORY.md | 长期记忆模板 |\n| HEARTBEAT.md | nanobot/templates/HEARTBEAT.md | 心跳任务模板 |"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3. 硬编码的提示词"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3.1 核心系统硬编码提示词"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "markdown",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "| 位置 | 提示词内容 | 作用 |\n|------|-----------|------|\n| ContextBuilder._RUNTIME_CONTEXT_TAG | [Runtime Context — metadata only, not instructions] | 运行时上下文标签 |\n| ContextBuilder._build_runtime_context | 构建包含当前时间、通道和聊天ID的运行时上下文 | 提供运行时元数据 |"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "3.2 工具相关硬编码提示词"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "markdown",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "| 工具 | 提示词内容 | 作用 |\n|------|-----------|------|\n| CronTool | Tool to schedule reminders and recurring tasks. | cron 工具描述 |\n| CronTool 参数说明 | 详细的参数说明和示例 | 指导用户如何使用 cron 工具 |"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "4. 提示词注入流程"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "核心身份：加载 identity.md 模板，包含运行时环境和工作空间信息"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "引导文件：加载 AGENTS.md、SOUL.md、USER.md、TOOLS.md"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "记忆上下文：从内存存储中获取记忆上下文"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "技能信息：加载始终激活的技能和技能摘要"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "numbered_list_item",
+      "numbered_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "运行时上下文：在用户消息前注入运行时元数据"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "5. 总结"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "code",
+      "code": {
+        "language": "markdown",
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "| 类型 | 数量 | 位置 | 可定制性 |\n|------|------|------|----------|\n| 通过文件注入的提示词 | 16+ | nanobot/templates/ 目录 | 高（可编辑） |\n| 硬编码的提示词 | 5+ | 代码中直接定义 | 低（需修改代码） |"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "object": "block",
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "nanobot 系统采用了混合的提示词注入方式，既通过文件系统提供了高度可定制的提示词模板，又在代码中硬编码了一些核心的系统提示词。这种设计使得系统既灵活又稳定，用户可以根据自己的需求定制代理行为，同时系统核心功能保持一致。"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
