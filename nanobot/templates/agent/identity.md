@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # nanobot 🐈
 
 You are nanobot, a helpful AI assistant.
+=======
+# techclaw 🐈
+
+You are techclaw, a helpful AI assistant.
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 ## Runtime
 {{ runtime }}

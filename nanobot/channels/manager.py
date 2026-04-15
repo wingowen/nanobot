@@ -75,6 +75,7 @@ class ChannelManager:
 
     def _validate_allow_from(self) -> None:
         for name, ch in self.channels.items():
+<<<<<<< HEAD
             cfg = ch.config
             if isinstance(cfg, dict):
                 if "allow_from" in cfg:
@@ -84,6 +85,9 @@ class ChannelManager:
             else:
                 allow = getattr(cfg, "allow_from", None)
             if allow == []:
+=======
+            if getattr(ch.config, "allow_from", None) == []:
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 raise SystemExit(
                     f'Error: "{name}" has empty allowFrom (denies all). '
                     f'Set ["*"] to allow everyone, or add specific user IDs.'

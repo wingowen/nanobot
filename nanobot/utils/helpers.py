@@ -400,7 +400,10 @@ def build_status_content(
     session_msg_count: int,
     context_tokens_estimate: int,
     search_usage_text: str | None = None,
+<<<<<<< HEAD
     active_task_count: int = 0,
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 ) -> str:
     """Build a human-readable runtime status snapshot.
     
@@ -432,7 +435,10 @@ def build_status_content(
         f"\U0001f4da Context: {ctx_used_str}/{ctx_total_str} ({ctx_pct}%)",
         f"\U0001f4ac Session: {session_msg_count} messages",
         f"\u23f1 Uptime: {uptime}",
+<<<<<<< HEAD
         f"\u26a1 Tasks: {active_task_count} active",
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     ]
     if search_usage_text:
         lines.append(search_usage_text)

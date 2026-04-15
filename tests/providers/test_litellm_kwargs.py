@@ -584,6 +584,7 @@ def test_openai_compat_keeps_tool_calls_after_consecutive_assistant_messages() -
     assert sanitized[2]["tool_call_id"] == "3ec83c30d"
 
 
+<<<<<<< HEAD
 def test_openai_compat_stringifies_dict_tool_arguments() -> None:
     with patch("nanobot.providers.openai_compat_provider.AsyncOpenAI"):
         provider = OpenAICompatProvider()
@@ -656,6 +657,8 @@ def test_openai_compat_defaults_missing_tool_arguments_to_empty_object() -> None
     assert sanitized[1]["tool_calls"][0]["function"]["arguments"] == "{}"
 
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 @pytest.mark.asyncio
 async def test_openai_compat_stream_watchdog_returns_error_on_stall(monkeypatch) -> None:
     monkeypatch.setenv("NANOBOT_STREAM_IDLE_TIMEOUT_S", "0")
@@ -730,6 +733,7 @@ def test_openai_no_thinking_extra_body() -> None:
     """Non-thinking providers should never get extra_body for thinking."""
     kw = _build_kwargs_for("openai", "gpt-4o", reasoning_effort="medium")
     assert "extra_body" not in kw
+<<<<<<< HEAD
 
 
 def test_kimi_k25_thinking_enabled() -> None:
@@ -777,3 +781,5 @@ def test_kimi_k2_thinking_series_no_thinking_injection() -> None:
     """kimi-k2-thinking series models must NOT receive extra_body.thinking."""
     kw = _build_kwargs_for("moonshot", "kimi-k2-thinking", reasoning_effort="high")
     assert "extra_body" not in kw
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

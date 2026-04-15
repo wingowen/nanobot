@@ -15,7 +15,10 @@ def test_status_shows_cache_hit_rate():
     )
     assert "60% cached" in content
     assert "2000 in / 300 out" in content
+<<<<<<< HEAD
     assert "Tasks: 0 active" in content
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 
 def test_status_no_cache_info():
@@ -31,7 +34,10 @@ def test_status_no_cache_info():
     )
     assert "cached" not in content.lower()
     assert "2000 in / 300 out" in content
+<<<<<<< HEAD
     assert "Tasks: 0 active" in content
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 
 def test_status_zero_cached_tokens():

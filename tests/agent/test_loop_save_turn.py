@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import asyncio
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
@@ -309,6 +312,7 @@ async def test_next_turn_after_crash_closes_pending_user_turn_before_new_input(t
         {"role": "assistant", "content": "new answer"},
     ]
     assert AgentLoop._PENDING_USER_TURN_KEY not in session.metadata
+<<<<<<< HEAD
 
 
 @pytest.mark.asyncio
@@ -417,3 +421,5 @@ async def test_stop_preserves_runtime_checkpoint_for_next_turn(tmp_path: Path) -
     ]
     assert AgentLoop._PENDING_USER_TURN_KEY not in session.metadata
     assert AgentLoop._RUNTIME_CHECKPOINT_KEY not in session.metadata
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

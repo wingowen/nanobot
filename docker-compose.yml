@@ -53,3 +53,40 @@ services:
     command: ["status"]
     stdin_open: true
     tty: true
+<<<<<<< HEAD
+=======
+
+  nanobot-web:
+    container_name: nanobot-web
+    image: nanobot-http-test:latest
+    restart: unless-stopped
+    ports:
+      - "18798:18792"
+      - "18799:18791"
+    volumes:
+      - ./nanobot:/app/nanobot
+      - ./http_api:/app/http_api
+      - ./.nanobot:/root/.nanobot
+      - ./tests:/app/tests
+    env_file:
+      - .env
+    command: bash -c "cd /app && nohup python -m nanobot gateway > /app/gateway.log 2>&1 & echo 'Gateway started' && exec python -m uvicorn http_api.main:app --host 0.0.0.0 --port 18792"
+
+  nanobots:
+    container_name: nanobots
+    image: nanobot-http-test:latest
+    restart: unless-stopped
+    # ports:
+    #   - "18798:18792"
+    #   - "18799:18791"
+    volumes:
+      - ./.nanobots:/app/.nanobots
+      - ./http_api:/app/http_api
+      - ./nanobot:/app/nanobot
+      - ./tests:/app/tests
+      - ./pyproject.toml:/app/pyproject.toml
+    env_file:
+      - .env
+    # command: bash -c "cd /app python -m nan python -m nanobot gateway > /app/gateway.log 2>&1 & echo 'Gateway started' && exec python -m uvicorn http_api.main:app --host 0.0.0.0 --port 18792"
+    command: bash -c "pip install --no-cache-dir -e . && tail -f /dev/null"
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

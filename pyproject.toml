@@ -1,6 +1,10 @@
 [project]
 name = "nanobot-ai"
+<<<<<<< HEAD
 version = "0.1.5.post1"
+=======
+version = "0.1.5"
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 description = "A lightweight personal AI assistant framework"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.11"
@@ -50,10 +54,13 @@ dependencies = [
     "tiktoken>=0.12.0,<1.0.0",
     "jinja2>=3.1.0,<4.0.0",
     "dulwich>=0.22.0,<1.0.0",
+<<<<<<< HEAD
     "pypdf>=5.0.0,<6.0.0",
     "python-docx>=1.1.0,<2.0.0",
     "openpyxl>=3.1.0,<4.0.0",
     "python-pptx>=1.0.0,<2.0.0",
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     "filelock>=3.25.2",
 ]
 

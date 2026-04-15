@@ -116,6 +116,7 @@ class BaseChannel(ABC):
 
     def is_allowed(self, sender_id: str) -> bool:
         """Check if *sender_id* is permitted.  Empty list → deny all; ``"*"`` → allow all."""
+<<<<<<< HEAD
         if isinstance(self.config, dict):
             if "allow_from" in self.config:
                 allow_list = self.config.get("allow_from")
@@ -123,6 +124,9 @@ class BaseChannel(ABC):
                 allow_list = self.config.get("allowFrom", [])
         else:
             allow_list = getattr(self.config, "allow_from", [])
+=======
+        allow_list = getattr(self.config, "allow_from", [])
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         if not allow_list:
             logger.warning("{}: allow_from is empty — all access denied", self.name)
             return False

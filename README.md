@@ -21,6 +21,7 @@
 
 ## 📢 News
 
+<<<<<<< HEAD
 - **2026-04-13** 🛡️ Agent turn hardened — user messages persisted early, auto-compact skips active tasks.
 - **2026-04-12** 🔒 Lark global domain support, Dream learns discovered skills, shell sandbox tightened.
 - **2026-04-11** ⚡ Auto compact shrinks sessions on the fly; Kagi web search; QQ & WeCom full media.
@@ -29,6 +30,8 @@
 - **2026-04-08** 📤 API file uploads, OpenAI reasoning auto-routing with Responses fallback.
 - **2026-04-07** 🧠 Anthropic adaptive thinking, MCP resources & prompts exposed as tools.
 - **2026-04-06** 🛰️ Langfuse observability, unified Whisper transcription, email attachments.
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 - **2026-04-05** 🚀 Released **v0.1.5** — sturdier long-running tasks, Dream two-stage memory, production-ready sandboxing and programming Agent SDK. Please see [release notes](https://github.com/HKUDS/nanobot/releases/tag/v0.1.5) for details.
 - **2026-04-04** 🚀 Jinja2 response templates, Dream memory hardened, smarter retry handling.
 - **2026-04-03** 🧠 Xiaomi MiMo provider, chain-of-thought reasoning visible, Telegram UX polish.
@@ -1061,6 +1064,7 @@ Connects directly to any OpenAI-compatible endpoint — LM Studio, llama.cpp, To
 ```
 
 > For local servers that don't require a key, set `apiKey` to any non-empty string (e.g. `"no-key"`).
+<<<<<<< HEAD
 >
 > `custom` is the right choice for providers that expose an OpenAI-compatible **chat completions** API. It does **not** force third-party endpoints onto the OpenAI/Azure **Responses API**.
 >
@@ -1085,6 +1089,8 @@ Connects directly to any OpenAI-compatible endpoint — LM Studio, llama.cpp, To
 > ```
 >
 > In short: **chat-completions-compatible endpoint → `custom`**; **Responses-compatible endpoint → `azure_openai`**.
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 </details>
 
@@ -1735,7 +1741,10 @@ Example config:
     }
   },
   "gateway": {
+<<<<<<< HEAD
     "host": "127.0.0.1",
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     "port": 18790
   }
 }
@@ -1748,6 +1757,7 @@ nanobot gateway --config ~/.nanobot-telegram/config.json
 nanobot gateway --config ~/.nanobot-discord/config.json
 ```
 
+<<<<<<< HEAD
 Each gateway instance also exposes a lightweight HTTP health endpoint on
 `gateway.host:gateway.port`. By default, the gateway binds to `127.0.0.1`,
 so the endpoint stays local unless you explicitly set `gateway.host` to a
@@ -1756,6 +1766,8 @@ public or LAN-facing address.
 - `GET /health` returns `{"status":"ok"}`
 - Other paths return `404`
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 Override workspace for one-off runs when needed:
 
 ```bash
@@ -1899,6 +1911,7 @@ By default, the API binds to `127.0.0.1:8900`. You can change this in `config.js
 - Single-message input: each request must contain exactly one `user` message
 - Fixed model: omit `model`, or pass the same model shown by `/v1/models`
 - No streaming: `stream=true` is not supported
+<<<<<<< HEAD
 - **File uploads**: supports images, PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx) via JSON base64 or `multipart/form-data` (max 10MB per file)
 - API requests run in the synthetic `api` channel, so the `message` tool does **not** automatically deliver to Telegram/Discord/etc. To proactively send to another chat, call `message` with an explicit `channel` and `chat_id` for an enabled channel.
 
@@ -1913,6 +1926,8 @@ Example tool call for cross-channel delivery from an API session:
 ```
 
 If `channel` points to a channel that is not enabled in your config, nanobot will queue the outbound event but no platform delivery will occur.
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 ### Endpoints
 
@@ -1931,6 +1946,7 @@ curl http://127.0.0.1:8900/v1/chat/completions \
   }'
 ```
 
+<<<<<<< HEAD
 ### File Upload (JSON base64)
 
 Send images inline using the OpenAI multimodal content format:
@@ -1969,6 +1985,8 @@ Supported file types:
 - **Documents**: PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx) (text extracted and sent to AI)
 - **Text**: TXT, Markdown, CSV, JSON, etc. (read directly)
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 ### Python (`requests`)
 
 ```python

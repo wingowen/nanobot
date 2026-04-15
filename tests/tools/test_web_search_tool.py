@@ -1,5 +1,10 @@
 """Tests for multi-provider web search."""
 
+<<<<<<< HEAD
+=======
+import asyncio
+
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 import httpx
 import pytest
 
@@ -18,6 +23,7 @@ def _response(status: int = 200, json: dict | None = None) -> httpx.Response:
     return r
 
 
+<<<<<<< HEAD
 def test_duckduckgo_search_is_exclusive():
     tool = _tool(provider="duckduckgo")
     assert tool.exclusive is True
@@ -37,6 +43,8 @@ def test_brave_without_api_key_is_treated_as_duckduckgo_for_concurrency(monkeypa
     assert tool.concurrency_safe is False
 
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 @pytest.mark.asyncio
 async def test_brave_search(monkeypatch):
     async def mock_get(self, url, **kw):
@@ -96,6 +104,10 @@ async def test_duckduckgo_search(monkeypatch):
     import nanobot.agent.tools.web as web_mod
     monkeypatch.setattr(web_mod, "DDGS", MockDDGS, raising=False)
 
+<<<<<<< HEAD
+=======
+    from ddgs import DDGS
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     monkeypatch.setattr("ddgs.DDGS", MockDDGS)
 
     tool = _tool(provider="duckduckgo")
@@ -281,3 +293,8 @@ async def test_duckduckgo_timeout_returns_error(monkeypatch):
     result = await tool.execute(query="test")
     gate.set()
     assert "Error" in result
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

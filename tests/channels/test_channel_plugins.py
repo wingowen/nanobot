@@ -646,10 +646,14 @@ class _ChannelWithAllowFrom(BaseChannel):
 
     def __init__(self, config, bus, allow_from):
         super().__init__(config, bus)
+<<<<<<< HEAD
         if isinstance(self.config, dict):
             self.config["allow_from"] = allow_from
         else:
             self.config.allow_from = allow_from
+=======
+        self.config.allow_from = allow_from
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     async def start(self) -> None:
         pass
@@ -718,6 +722,7 @@ async def test_validate_allow_from_passes_with_asterisk():
 
 
 @pytest.mark.asyncio
+<<<<<<< HEAD
 async def test_validate_allow_from_raises_on_empty_dict_allow_from():
     """_validate_allow_from should reject empty dict-backed allow_from lists."""
     fake_config = SimpleNamespace(
@@ -737,6 +742,8 @@ async def test_validate_allow_from_raises_on_empty_dict_allow_from():
 
 
 @pytest.mark.asyncio
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 async def test_get_channel_returns_channel_if_exists():
     """get_channel should return the channel if it exists."""
     fake_config = SimpleNamespace(

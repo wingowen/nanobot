@@ -96,6 +96,7 @@ class WebSearchTool(Tool):
         self.config = config if config is not None else WebSearchConfig()
         self.proxy = proxy
 
+<<<<<<< HEAD
     def _effective_provider(self) -> str:
         """Resolve the backend that execute() will actually use."""
         provider = self.config.provider.strip().lower() or "brave"
@@ -118,15 +119,20 @@ class WebSearchTool(Tool):
             return "kagi" if api_key else "duckduckgo"
         return provider
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     @property
     def read_only(self) -> bool:
         return True
 
+<<<<<<< HEAD
     @property
     def exclusive(self) -> bool:
         """DuckDuckGo searches are serialized because ddgs is not concurrency-safe."""
         return self._effective_provider() == "duckduckgo"
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     async def execute(self, query: str, count: int | None = None, **kwargs: Any) -> str:
         provider = self.config.provider.strip().lower() or "brave"
         n = min(max(count or self.config.max_results, 1), 10)

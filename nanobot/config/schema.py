@@ -152,7 +152,11 @@ class ApiConfig(Base):
 class GatewayConfig(Base):
     """Gateway/server configuration."""
 
+<<<<<<< HEAD
     host: str = "127.0.0.1"  # Safer default: local-only bind.
+=======
+    host: str = "0.0.0.0"
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     port: int = 18790
     heartbeat: HeartbeatConfig = Field(default_factory=HeartbeatConfig)
 

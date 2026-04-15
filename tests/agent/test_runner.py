@@ -18,6 +18,7 @@ from nanobot.providers.base import LLMResponse, ToolCallRequest
 _MAX_TOOL_RESULT_CHARS = AgentDefaults().max_tool_result_chars
 
 
+<<<<<<< HEAD
 def _make_injection_callback(queue: asyncio.Queue):
     """Return an async callback that drains *queue* into a list of dicts."""
     async def inject_cb():
@@ -28,6 +29,8 @@ def _make_injection_callback(queue: asyncio.Queue):
     return inject_cb
 
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 def _make_loop(tmp_path):
     from nanobot.agent.loop import AgentLoop
     from nanobot.bus.queue import MessageBus
@@ -689,6 +692,7 @@ async def test_runner_keeps_going_when_tool_result_persistence_fails():
 
 
 class _DelayTool(Tool):
+<<<<<<< HEAD
     def __init__(
         self,
         name: str,
@@ -698,11 +702,17 @@ class _DelayTool(Tool):
         shared_events: list[str],
         exclusive: bool = False,
     ):
+=======
+    def __init__(self, name: str, *, delay: float, read_only: bool, shared_events: list[str]):
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         self._name = name
         self._delay = delay
         self._read_only = read_only
         self._shared_events = shared_events
+<<<<<<< HEAD
         self._exclusive = exclusive
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     @property
     def name(self) -> str:
@@ -720,10 +730,13 @@ class _DelayTool(Tool):
     def read_only(self) -> bool:
         return self._read_only
 
+<<<<<<< HEAD
     @property
     def exclusive(self) -> bool:
         return self._exclusive
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     async def execute(self, **kwargs):
         self._shared_events.append(f"start:{self._name}")
         await asyncio.sleep(self._delay)
@@ -770,6 +783,7 @@ async def test_runner_batches_read_only_tools_before_exclusive_work():
 
 
 @pytest.mark.asyncio
+<<<<<<< HEAD
 async def test_runner_does_not_batch_exclusive_read_only_tools():
     from nanobot.agent.runner import AgentRunSpec, AgentRunner
 
@@ -812,6 +826,8 @@ async def test_runner_does_not_batch_exclusive_read_only_tools():
 
 
 @pytest.mark.asyncio
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 async def test_runner_blocks_repeated_external_fetches():
     from nanobot.agent.runner import AgentRunSpec, AgentRunner
 
@@ -1953,7 +1969,16 @@ async def test_checkpoint1_injects_after_tool_execution():
     tools.execute = AsyncMock(return_value="file content")
 
     injection_queue = asyncio.Queue()
+<<<<<<< HEAD
     inject_cb = _make_injection_callback(injection_queue)
+=======
+
+    async def inject_cb():
+        items = []
+        while not injection_queue.empty():
+            items.append(await injection_queue.get())
+        return items
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     # Put a follow-up message in the queue before the run starts
     await injection_queue.put(
@@ -2011,7 +2036,16 @@ async def test_checkpoint2_injects_after_final_response_with_resuming_stream():
     tools.get_definitions.return_value = []
 
     injection_queue = asyncio.Queue()
+<<<<<<< HEAD
     inject_cb = _make_injection_callback(injection_queue)
+=======
+
+    async def inject_cb():
+        items = []
+        while not injection_queue.empty():
+            items.append(await injection_queue.get())
+        return items
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     # Inject a follow-up that arrives during the first response
     await injection_queue.put(
@@ -2060,7 +2094,16 @@ async def test_checkpoint2_preserves_final_response_in_history_before_followup()
     tools.get_definitions.return_value = []
 
     injection_queue = asyncio.Queue()
+<<<<<<< HEAD
     inject_cb = _make_injection_callback(injection_queue)
+=======
+
+    async def inject_cb():
+        items = []
+        while not injection_queue.empty():
+            items.append(await injection_queue.get())
+        return items
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     await injection_queue.put(
         InboundMessage(channel="cli", sender_id="u", chat_id="c", content="follow-up question")
@@ -2460,6 +2503,7 @@ async def test_dispatch_republishes_leftover_queue_messages(tmp_path):
     contents = [m.content for m in msgs]
     assert "leftover-1" in contents
     assert "leftover-2" in contents
+<<<<<<< HEAD
 
 
 @pytest.mark.asyncio
@@ -2787,3 +2831,5 @@ async def test_injection_cycle_cap_on_error_path():
     # Should cap: _MAX_INJECTION_CYCLES drained rounds + 1 final round that breaks
     assert call_count["n"] == _MAX_INJECTION_CYCLES + 1
     assert drain_count["n"] == _MAX_INJECTION_CYCLES
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

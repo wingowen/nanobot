@@ -7,17 +7,23 @@ All requests route to a single persistent API session.
 from __future__ import annotations
 
 import asyncio
+<<<<<<< HEAD
 import base64
 import mimetypes
 import re
 import time
 import uuid
 from pathlib import Path
+=======
+import time
+import uuid
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 from typing import Any
 
 from aiohttp import web
 from loguru import logger
 
+<<<<<<< HEAD
 from nanobot.config.paths import get_media_dir
 from nanobot.utils.helpers import safe_filename
 from nanobot.utils.runtime import EMPTY_FINAL_RESPONSE_MESSAGE
@@ -29,6 +35,10 @@ _DATA_URL_RE = re.compile(r"^data:([^;]+);base64,(.+)$", re.DOTALL)
 class _FileSizeExceeded(Exception):
     """Raised when an uploaded file exceeds the size limit."""
 
+=======
+from nanobot.utils.runtime import EMPTY_FINAL_RESPONSE_MESSAGE
+
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 API_SESSION_KEY = "api:default"
 API_CHAT_ID = "default"
 
@@ -71,6 +81,7 @@ def _response_text(value: Any) -> str:
 
 
 # ---------------------------------------------------------------------------
+<<<<<<< HEAD
 # Upload helpers
 # ---------------------------------------------------------------------------
 
@@ -162,18 +173,49 @@ async def _parse_multipart(request: web.Request) -> tuple[str, list[str], str | 
 
 
 # ---------------------------------------------------------------------------
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 # Route handlers
 # ---------------------------------------------------------------------------
 
 async def handle_chat_completions(request: web.Request) -> web.Response:
+<<<<<<< HEAD
     """POST /v1/chat/completions — supports JSON and multipart/form-data."""
     content_type = request.content_type or ""
     if not isinstance(content_type, str):
         content_type = ""
+=======
+    """POST /v1/chat/completions"""
+
+    # --- Parse body ---
+    try:
+        body = await request.json()
+    except Exception:
+        return _error_json(400, "Invalid JSON body")
+
+    messages = body.get("messages")
+    if not isinstance(messages, list) or len(messages) != 1:
+        return _error_json(400, "Only a single user message is supported")
+
+    # Stream not yet supported
+    if body.get("stream", False):
+        return _error_json(400, "stream=true is not supported yet. Set stream=false or omit it.")
+
+    message = messages[0]
+    if not isinstance(message, dict) or message.get("role") != "user":
+        return _error_json(400, "Only a single user message is supported")
+    user_content = message.get("content", "")
+    if isinstance(user_content, list):
+        # Multi-modal content array — extract text parts
+        user_content = " ".join(
+            part.get("text", "") for part in user_content if part.get("type") == "text"
+        )
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     agent_loop = request.app["agent_loop"]
     timeout_s: float = request.app.get("request_timeout", 120.0)
     model_name: str = request.app.get("model_name", "nanobot")
+<<<<<<< HEAD
 
     try:
         if content_type.startswith("multipart/"):
@@ -202,6 +244,16 @@ async def handle_chat_completions(request: web.Request) -> web.Response:
     session_lock = session_locks.setdefault(session_key, asyncio.Lock())
 
     logger.info("API request session_key={} media={} text={}", session_key, len(media_paths), text[:80])
+=======
+    if (requested_model := body.get("model")) and requested_model != model_name:
+        return _error_json(400, f"Only configured model '{model_name}' is available")
+
+    session_key = f"api:{body['session_id']}" if body.get("session_id") else API_SESSION_KEY
+    session_locks: dict[str, asyncio.Lock] = request.app["session_locks"]
+    session_lock = session_locks.setdefault(session_key, asyncio.Lock())
+
+    logger.info("API request session_key={} content={}", session_key, user_content[:80])
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     _FALLBACK = EMPTY_FINAL_RESPONSE_MESSAGE
 
@@ -210,8 +262,12 @@ async def handle_chat_completions(request: web.Request) -> web.Response:
             try:
                 response = await asyncio.wait_for(
                     agent_loop.process_direct(
+<<<<<<< HEAD
                         content=text,
                         media=media_paths if media_paths else None,
+=======
+                        content=user_content,
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                         session_key=session_key,
                         channel="api",
                         chat_id=API_CHAT_ID,
@@ -221,11 +277,21 @@ async def handle_chat_completions(request: web.Request) -> web.Response:
                 response_text = _response_text(response)
 
                 if not response_text or not response_text.strip():
+<<<<<<< HEAD
                     logger.warning("Empty response for session {}, retrying", session_key)
                     retry_response = await asyncio.wait_for(
                         agent_loop.process_direct(
                             content=text,
                             media=media_paths if media_paths else None,
+=======
+                    logger.warning(
+                        "Empty response for session {}, retrying",
+                        session_key,
+                    )
+                    retry_response = await asyncio.wait_for(
+                        agent_loop.process_direct(
+                            content=user_content,
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                             session_key=session_key,
                             channel="api",
                             chat_id=API_CHAT_ID,
@@ -234,7 +300,14 @@ async def handle_chat_completions(request: web.Request) -> web.Response:
                     )
                     response_text = _response_text(retry_response)
                     if not response_text or not response_text.strip():
+<<<<<<< HEAD
                         logger.warning("Empty response after retry, using fallback")
+=======
+                        logger.warning(
+                            "Empty response after retry for session {}, using fallback",
+                            session_key,
+                        )
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                         response_text = _FALLBACK
 
             except asyncio.TimeoutError:
@@ -282,7 +355,11 @@ def create_app(agent_loop, model_name: str = "nanobot", request_timeout: float =
         model_name: Model name reported in responses.
         request_timeout: Per-request timeout in seconds.
     """
+<<<<<<< HEAD
     app = web.Application(client_max_size=20 * 1024 * 1024)  # 20MB for base64 images
+=======
+    app = web.Application()
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     app["agent_loop"] = agent_loop
     app["model_name"] = model_name
     app["request_timeout"] = request_timeout

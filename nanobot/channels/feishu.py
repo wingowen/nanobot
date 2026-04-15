@@ -1290,6 +1290,10 @@ class FeishuChannel(BaseChannel):
 
         Supported metadata keys:
             _stream_end: Finalize the streaming card.
+<<<<<<< HEAD
+=======
+            _resuming:   Mid-turn pause – flush but keep the buffer alive.
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
             _tool_hint:  Delta is a formatted tool hint (for display only).
             message_id:  Original message id (used with _stream_end for reaction cleanup).
             reaction_id: Reaction id to remove on stream end.
@@ -1308,6 +1312,7 @@ class FeishuChannel(BaseChannel):
                 if self.config.done_emoji and message_id:
                     await self._add_reaction(message_id, self.config.done_emoji)
 
+<<<<<<< HEAD
             buf = self._stream_bufs.pop(chat_id, None)
             if not buf or not buf.text:
                 return
@@ -1317,12 +1322,34 @@ class FeishuChannel(BaseChannel):
             if buf.card_id:
                 buf.sequence += 1
                 ok = await loop.run_in_executor(
+=======
+            resuming = meta.get("_resuming", False)
+            if resuming:
+                # Mid-turn pause (e.g. tool call between streaming segments).
+                # Flush current text to card but keep the buffer alive so the
+                # next segment appends to the same card.
+                buf = self._stream_bufs.get(chat_id)
+                if buf and buf.card_id and buf.text:
+                    buf.sequence += 1
+                    await loop.run_in_executor(
+                        None, self._stream_update_text_sync, buf.card_id, buf.text, buf.sequence,
+                    )
+                return
+
+            buf = self._stream_bufs.pop(chat_id, None)
+            if not buf or not buf.text:
+                return
+            if buf.card_id:
+                buf.sequence += 1
+                await loop.run_in_executor(
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                     None,
                     self._stream_update_text_sync,
                     buf.card_id,
                     buf.text,
                     buf.sequence,
                 )
+<<<<<<< HEAD
                 if ok:
                     buf.sequence += 1
                     await loop.run_in_executor(
@@ -1346,6 +1373,27 @@ class FeishuChannel(BaseChannel):
                 await loop.run_in_executor(
                     None, self._send_message_sync, rid_type, chat_id, "interactive", card
                 )
+=======
+                # Required so the chat list preview exits the streaming placeholder (Feishu streaming card docs).
+                buf.sequence += 1
+                await loop.run_in_executor(
+                    None,
+                    self._close_streaming_mode_sync,
+                    buf.card_id,
+                    buf.sequence,
+                )
+            else:
+                for chunk in self._split_elements_by_table_limit(
+                    self._build_card_elements(buf.text)
+                ):
+                    card = json.dumps(
+                        {"config": {"wide_screen_mode": True}, "elements": chunk},
+                        ensure_ascii=False,
+                    )
+                    await loop.run_in_executor(
+                        None, self._send_message_sync, rid_type, chat_id, "interactive", card
+                    )
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
             return
 
         # --- accumulate delta ---
@@ -1397,6 +1445,7 @@ class FeishuChannel(BaseChannel):
                 if buf and buf.card_id:
                     # Delegate to send_delta so tool hints get the same
                     # throttling (and card creation) as regular text deltas.
+<<<<<<< HEAD
                     await self.send_delta(
                         msg.chat_id,
                         "\n\n" + self._format_tool_hint_delta(hint) + "\n\n",
@@ -1412,6 +1461,16 @@ class FeishuChannel(BaseChannel):
                 )
                 await loop.run_in_executor(
                     None, self._send_message_sync, receive_id_type, msg.chat_id, "interactive", card
+=======
+                    lines = self.__class__._format_tool_hint_lines(hint).split("\n")
+                    delta = "\n\n" + "\n".join(
+                        f"{self.config.tool_hint_prefix} {ln}" for ln in lines if ln.strip()
+                    ) + "\n\n"
+                    await self.send_delta(msg.chat_id, delta)
+                    return
+                await self._send_tool_hint_card(
+                    receive_id_type, msg.chat_id, hint
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 )
                 return
 
@@ -1708,9 +1767,41 @@ class FeishuChannel(BaseChannel):
 
         return "\n".join(part for part in parts if part)
 
+<<<<<<< HEAD
     def _format_tool_hint_delta(self, tool_hint: str) -> str:
         """Format a tool hint string with the 🔧 prefix for each line."""
         lines = self.__class__._format_tool_hint_lines(tool_hint).split("\n")
         return "\n".join(
             f"{self.config.tool_hint_prefix} {ln}" for ln in lines if ln.strip()
+=======
+    async def _send_tool_hint_card(
+        self, receive_id_type: str, receive_id: str, tool_hint: str
+    ) -> None:
+        """Send tool hint as an interactive card with formatted code block.
+
+        Args:
+            receive_id_type: "chat_id" or "open_id"
+            receive_id: The target chat or user ID
+            tool_hint: Formatted tool hint string (e.g., 'web_search("q"), read_file("path")')
+        """
+        loop = asyncio.get_running_loop()
+
+        # Put each top-level tool call on its own line without altering commas inside arguments.
+        formatted_code = self.__class__._format_tool_hint_lines(tool_hint)
+
+        card = {
+            "config": {"wide_screen_mode": True},
+            "elements": [
+                {"tag": "markdown", "content": f"**Tool Calls**\n\n```text\n{formatted_code}\n```"}
+            ],
+        }
+
+        await loop.run_in_executor(
+            None,
+            self._send_message_sync,
+            receive_id_type,
+            receive_id,
+            "interactive",
+            json.dumps(card, ensure_ascii=False),
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         )

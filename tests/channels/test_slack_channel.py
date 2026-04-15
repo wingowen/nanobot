@@ -10,7 +10,12 @@ except ImportError:
 
 from nanobot.bus.events import OutboundMessage
 from nanobot.bus.queue import MessageBus
+<<<<<<< HEAD
 from nanobot.channels.slack import SlackChannel, SlackConfig
+=======
+from nanobot.channels.slack import SlackChannel
+from nanobot.channels.slack import SlackConfig
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 
 class _FakeAsyncWebClient:
@@ -19,12 +24,15 @@ class _FakeAsyncWebClient:
         self.file_upload_calls: list[dict[str, object | None]] = []
         self.reactions_add_calls: list[dict[str, object | None]] = []
         self.reactions_remove_calls: list[dict[str, object | None]] = []
+<<<<<<< HEAD
         self.conversations_list_calls: list[dict[str, object | None]] = []
         self.users_list_calls: list[dict[str, object | None]] = []
         self.conversations_open_calls: list[dict[str, object | None]] = []
         self._conversations_pages: list[dict[str, object]] = []
         self._users_pages: list[dict[str, object]] = []
         self._open_dm_response: dict[str, object] = {"channel": {"id": "D_OPENED"}}
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     async def chat_postMessage(
         self,
@@ -86,6 +94,7 @@ class _FakeAsyncWebClient:
             }
         )
 
+<<<<<<< HEAD
     async def conversations_list(self, **kwargs):
         self.conversations_list_calls.append(kwargs)
         if self._conversations_pages:
@@ -102,6 +111,8 @@ class _FakeAsyncWebClient:
         self.conversations_open_calls.append(kwargs)
         return self._open_dm_response
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 @pytest.mark.asyncio
 async def test_send_uses_thread_for_channel_messages() -> None:
@@ -172,6 +183,7 @@ async def test_send_updates_reaction_when_final_response_sent() -> None:
     assert fake_web.reactions_add_calls == [
         {"channel": "C123", "name": "white_check_mark", "timestamp": "1700000000.000100"}
     ]
+<<<<<<< HEAD
 
 
 @pytest.mark.asyncio
@@ -316,3 +328,5 @@ async def test_send_raises_when_named_target_cannot_be_resolved() -> None:
                 content="hello",
             )
         )
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

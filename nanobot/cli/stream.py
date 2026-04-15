@@ -102,7 +102,11 @@ class StreamRenderer:
             self._live = Live(self._render(), console=c, auto_refresh=False)
             self._live.start()
         now = time.monotonic()
+<<<<<<< HEAD
         if (now - self._t) > 0.15:
+=======
+        if "\n" in delta or (now - self._t) > 0.05:
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
             self._live.update(self._render())
             self._live.refresh()
             self._t = now

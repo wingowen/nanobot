@@ -70,6 +70,10 @@ class AutoCompact:
                 continue
             if self._is_expired(info.get("updated_at"), now):
                 self._archiving.add(key)
+<<<<<<< HEAD
+=======
+                logger.debug("Auto-compact: scheduling archival for {} (idle > {} min)", key, self._ttl)
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 schedule_background(self._archive(key))
 
     async def _archive(self, key: str) -> None:
@@ -78,6 +82,10 @@ class AutoCompact:
             session = self.sessions.get_or_create(key)
             archive_msgs, kept_msgs = self._split_unconsolidated(session)
             if not archive_msgs and not kept_msgs:
+<<<<<<< HEAD
+=======
+                logger.debug("Auto-compact: skipping {}, no un-consolidated messages", key)
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 session.updated_at = datetime.now()
                 self.sessions.save(session)
                 return
@@ -93,6 +101,7 @@ class AutoCompact:
             session.last_consolidated = 0
             session.updated_at = datetime.now()
             self.sessions.save(session)
+<<<<<<< HEAD
             if archive_msgs:
                 logger.info(
                     "Auto-compact: archived {} (archived={}, kept={}, summary={})",
@@ -101,6 +110,15 @@ class AutoCompact:
                     len(kept_msgs),
                     bool(summary),
                 )
+=======
+            logger.info(
+                "Auto-compact: archived {} (archived={}, kept={}, summary={})",
+                key,
+                len(archive_msgs),
+                len(kept_msgs),
+                bool(summary),
+            )
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         except Exception:
             logger.exception("Auto-compact: failed for {}", key)
         finally:

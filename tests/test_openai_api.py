@@ -194,7 +194,10 @@ async def test_successful_request_uses_fixed_api_session(aiohttp_client, mock_ag
     assert body["model"] == "test-model"
     mock_agent.process_direct.assert_called_once_with(
         content="hello",
+<<<<<<< HEAD
         media=None,
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         session_key=API_SESSION_KEY,
         channel="api",
         chat_id=API_CHAT_ID,
@@ -206,7 +209,11 @@ async def test_successful_request_uses_fixed_api_session(aiohttp_client, mock_ag
 async def test_followup_requests_share_same_session_key(aiohttp_client) -> None:
     call_log: list[str] = []
 
+<<<<<<< HEAD
     async def fake_process(content, session_key="", channel="", chat_id="", **kwargs):
+=======
+    async def fake_process(content, session_key="", channel="", chat_id=""):
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         call_log.append(session_key)
         return f"reply to {content}"
 
@@ -237,7 +244,11 @@ async def test_followup_requests_share_same_session_key(aiohttp_client) -> None:
 async def test_fixed_session_requests_are_serialized(aiohttp_client) -> None:
     order: list[str] = []
 
+<<<<<<< HEAD
     async def slow_process(content, session_key="", channel="", chat_id="", **kwargs):
+=======
+    async def slow_process(content, session_key="", channel="", chat_id=""):
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         order.append(f"start:{content}")
         await asyncio.sleep(0.1)
         order.append(f"end:{content}")
@@ -308,12 +319,21 @@ async def test_multimodal_content_extracts_text(aiohttp_client, mock_agent) -> N
         },
     )
     assert resp.status == 200
+<<<<<<< HEAD
     call_kwargs = mock_agent.process_direct.call_args.kwargs
     assert call_kwargs["content"] == "describe this"
     assert call_kwargs["session_key"] == API_SESSION_KEY
     assert call_kwargs["channel"] == "api"
     assert call_kwargs["chat_id"] == API_CHAT_ID
     assert len(call_kwargs.get("media") or []) >= 0  # base64 images saved to disk
+=======
+    mock_agent.process_direct.assert_called_once_with(
+        content="describe this",
+        session_key=API_SESSION_KEY,
+        channel="api",
+        chat_id=API_CHAT_ID,
+    )
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 
 @pytest.mark.skipif(not HAS_AIOHTTP, reason="aiohttp not installed")
@@ -321,7 +341,11 @@ async def test_multimodal_content_extracts_text(aiohttp_client, mock_agent) -> N
 async def test_empty_response_retry_then_success(aiohttp_client) -> None:
     call_count = 0
 
+<<<<<<< HEAD
     async def sometimes_empty(content, session_key="", channel="", chat_id="", **kwargs):
+=======
+    async def sometimes_empty(content, session_key="", channel="", chat_id=""):
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         nonlocal call_count
         call_count += 1
         if call_count == 1:
@@ -352,7 +376,11 @@ async def test_empty_response_falls_back(aiohttp_client) -> None:
 
     call_count = 0
 
+<<<<<<< HEAD
     async def always_empty(content, session_key="", channel="", chat_id="", **kwargs):
+=======
+    async def always_empty(content, session_key="", channel="", chat_id=""):
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         nonlocal call_count
         call_count += 1
         return ""
@@ -372,6 +400,7 @@ async def test_empty_response_falls_back(aiohttp_client) -> None:
     body = await resp.json()
     assert body["choices"][0]["message"]["content"] == EMPTY_FINAL_RESPONSE_MESSAGE
     assert call_count == 2
+<<<<<<< HEAD
 
 
 @pytest.mark.asyncio
@@ -400,3 +429,5 @@ async def test_process_direct_accepts_media() -> None:
     assert captured_msg is not None
     assert captured_msg.media == ["/tmp/image.png", "/tmp/report.pdf"]
     assert captured_msg.content == "analyze this"
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

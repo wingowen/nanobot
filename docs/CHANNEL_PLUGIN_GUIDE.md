@@ -290,6 +290,10 @@ async def send_delta(self, chat_id: str, delta: str, metadata: dict[str, Any] | 
 |------|---------|
 | `_stream_delta: True` | A content chunk (delta contains the new text) |
 | `_stream_end: True` | Streaming finished (delta is empty) |
+<<<<<<< HEAD
+=======
+| `_resuming: True` | More streaming rounds coming (e.g. tool call then another response) |
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 ### Example: Webhook with Streaming
 

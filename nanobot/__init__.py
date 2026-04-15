@@ -21,7 +21,11 @@ def _resolve_version() -> str:
         return _pkg_version("nanobot-ai")
     except PackageNotFoundError:
         # Source checkouts often import nanobot without installed dist-info.
+<<<<<<< HEAD
         return _read_pyproject_version() or "0.1.5.post1"
+=======
+        return _read_pyproject_version() or "0.1.5"
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 
 __version__ = _resolve_version()

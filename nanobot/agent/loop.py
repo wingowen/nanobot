@@ -17,10 +17,17 @@ from nanobot.agent.autocompact import AutoCompact
 from nanobot.agent.context import ContextBuilder
 from nanobot.agent.hook import AgentHook, AgentHookContext, CompositeHook
 from nanobot.agent.memory import Consolidator, Dream
+<<<<<<< HEAD
 from nanobot.agent.runner import _MAX_INJECTIONS_PER_TURN, AgentRunner, AgentRunSpec
 from nanobot.agent.skills import BUILTIN_SKILLS_DIR
 from nanobot.agent.subagent import SubagentManager
 from nanobot.agent.tools.cron import CronTool
+=======
+from nanobot.agent.runner import _MAX_INJECTIONS_PER_TURN, AgentRunSpec, AgentRunner
+from nanobot.agent.subagent import SubagentManager
+from nanobot.agent.tools.cron import CronTool
+from nanobot.agent.skills import BUILTIN_SKILLS_DIR
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 from nanobot.agent.tools.filesystem import EditFileTool, ListDirTool, ReadFileTool, WriteFileTool
 from nanobot.agent.tools.message import MessageTool
 from nanobot.agent.tools.notebook import NotebookEditTool
@@ -30,6 +37,7 @@ from nanobot.agent.tools.shell import ExecTool
 from nanobot.agent.tools.spawn import SpawnTool
 from nanobot.agent.tools.web import WebFetchTool, WebSearchTool
 from nanobot.bus.events import InboundMessage, OutboundMessage
+<<<<<<< HEAD
 from nanobot.bus.queue import MessageBus
 from nanobot.command import CommandContext, CommandRouter, register_builtin_commands
 from nanobot.config.schema import AgentDefaults
@@ -38,6 +46,14 @@ from nanobot.session.manager import Session, SessionManager
 from nanobot.utils.document import extract_documents
 from nanobot.utils.helpers import image_placeholder_text
 from nanobot.utils.helpers import truncate_text as truncate_text_fn
+=======
+from nanobot.command import CommandContext, CommandRouter, register_builtin_commands
+from nanobot.bus.queue import MessageBus
+from nanobot.config.schema import AgentDefaults
+from nanobot.providers.base import LLMProvider
+from nanobot.session.manager import Session, SessionManager
+from nanobot.utils.helpers import image_placeholder_text, truncate_text as truncate_text_fn
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 from nanobot.utils.runtime import EMPTY_FINAL_RESPONSE_MESSAGE
 
 if TYPE_CHECKING:
@@ -385,12 +401,19 @@ class AgentLoop:
                     pending_msg = pending_queue.get_nowait()
                 except asyncio.QueueEmpty:
                     break
+<<<<<<< HEAD
                 content = pending_msg.content
                 media = pending_msg.media if pending_msg.media else None
                 if media:
                     content, media = extract_documents(content, media)
                     media = media or None
                 user_content = self.context._build_user_content(content, media)
+=======
+                user_content = self.context._build_user_content(
+                    pending_msg.content,
+                    pending_msg.media if pending_msg.media else None,
+                )
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 runtime_ctx = self.context._build_runtime_context(
                     pending_msg.channel,
                     pending_msg.chat_id,
@@ -656,12 +679,15 @@ class AgentLoop:
                 content=final_content or "Background task completed.",
             )
 
+<<<<<<< HEAD
         # Extract document text from media at the processing boundary so all
         # channels benefit without format-specific logic in ContextBuilder.
         if msg.media:
             new_content, image_only = extract_documents(msg.content, msg.media)
             msg = dataclasses.replace(msg, content=new_content, media=image_only)
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         preview = msg.content[:80] + "..." if len(msg.content) > 80 else msg.content
         logger.info("Processing message from {}:{}: {}", msg.channel, msg.sender_id, preview)
 
@@ -739,12 +765,26 @@ class AgentLoop:
         if final_content is None or not final_content.strip():
             final_content = EMPTY_FINAL_RESPONSE_MESSAGE
 
+<<<<<<< HEAD
         # Skip the already-persisted user message when saving the turn
         save_skip = 1 + len(history) + (1 if user_persisted_early else 0)
         self._save_turn(session, all_msgs, save_skip)
         self._clear_pending_user_turn(session)
         self._clear_runtime_checkpoint(session)
         self.sessions.save(session)
+=======
+        if on_progress and final_content:
+            await on_progress(final_content)
+
+        try:
+            save_skip = 1 + len(history) + (1 if user_persisted_early else 0)
+            self._save_turn(session, all_msgs, save_skip)
+            self._clear_pending_user_turn(session)
+            self._clear_runtime_checkpoint(session)
+            self.sessions.save(session)
+        except Exception:
+            logger.exception("Error saving session {}", session.key)
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         self._schedule_background(self.consolidator.maybe_consolidate_by_tokens(session))
 
         # When follow-up messages were injected mid-turn, a later natural
@@ -962,17 +1002,24 @@ class AgentLoop:
         session_key: str = "cli:direct",
         channel: str = "cli",
         chat_id: str = "direct",
+<<<<<<< HEAD
         media: list[str] | None = None,
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         on_progress: Callable[[str], Awaitable[None]] | None = None,
         on_stream: Callable[[str], Awaitable[None]] | None = None,
         on_stream_end: Callable[..., Awaitable[None]] | None = None,
     ) -> OutboundMessage | None:
         """Process a message directly and return the outbound payload."""
         await self._connect_mcp()
+<<<<<<< HEAD
         msg = InboundMessage(
             channel=channel, sender_id="user", chat_id=chat_id,
             content=content, media=media or [],
         )
+=======
+        msg = InboundMessage(channel=channel, sender_id="user", chat_id=chat_id, content=content)
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         return await self._process_message(
             msg,
             session_key=session_key,

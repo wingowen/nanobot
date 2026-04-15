@@ -718,6 +718,7 @@ class LLMProvider(ABC):
                     identical_error_count,
                     (response.content or "")[:120].lower(),
                 )
+<<<<<<< HEAD
                 if on_retry_wait:
                     await on_retry_wait(
                         f"Persistent retry stopped after {identical_error_count} identical errors."
@@ -734,6 +735,11 @@ class LLMProvider(ABC):
                     await on_retry_wait(
                         f"Model request failed after {attempt} retries, giving up."
                     )
+=======
+                return response
+
+            if not persistent and attempt > len(delays):
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 break
 
             base_delay = delays[min(attempt - 1, len(delays) - 1)]

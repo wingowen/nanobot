@@ -5,7 +5,10 @@ import re
 from typing import Any
 
 from loguru import logger
+<<<<<<< HEAD
 from pydantic import Field
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 from slack_sdk.socket_mode.request import SocketModeRequest
 from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.websockets import SocketModeClient
@@ -14,6 +17,11 @@ from slackify_markdown import slackify_markdown
 
 from nanobot.bus.events import OutboundMessage
 from nanobot.bus.queue import MessageBus
+<<<<<<< HEAD
+=======
+from pydantic import Field
+
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 from nanobot.channels.base import BaseChannel
 from nanobot.config.schema import Base
 
@@ -49,9 +57,12 @@ class SlackChannel(BaseChannel):
 
     name = "slack"
     display_name = "Slack"
+<<<<<<< HEAD
     _SLACK_ID_RE = re.compile(r"^[CDGUW][A-Z0-9]{2,}$")
     _SLACK_CHANNEL_REF_RE = re.compile(r"^<#([A-Z0-9]+)(?:\|[^>]+)?>$")
     _SLACK_USER_REF_RE = re.compile(r"^<@([A-Z0-9]+)(?:\|[^>]+)?>$")
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     @classmethod
     def default_config(cls) -> dict[str, Any]:
@@ -65,7 +76,10 @@ class SlackChannel(BaseChannel):
         self._web_client: AsyncWebClient | None = None
         self._socket_client: SocketModeClient | None = None
         self._bot_user_id: str | None = None
+<<<<<<< HEAD
         self._target_cache: dict[str, str] = {}
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
     async def start(self) -> None:
         """Start the Slack Socket Mode client."""
@@ -116,6 +130,7 @@ class SlackChannel(BaseChannel):
             logger.warning("Slack client not running")
             return
         try:
+<<<<<<< HEAD
             target_chat_id = await self._resolve_target_chat_id(msg.chat_id)
             slack_meta = msg.metadata.get("slack", {}) if msg.metadata else {}
             thread_ts = slack_meta.get("thread_ts")
@@ -127,12 +142,23 @@ class SlackChannel(BaseChannel):
                 if thread_ts and channel_type != "im" and target_chat_id == origin_chat_id
                 else None
             )
+=======
+            slack_meta = msg.metadata.get("slack", {}) if msg.metadata else {}
+            thread_ts = slack_meta.get("thread_ts")
+            channel_type = slack_meta.get("channel_type")
+            # Slack DMs don't use threads; channel/group replies may keep thread_ts.
+            thread_ts_param = thread_ts if thread_ts and channel_type != "im" else None
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
             # Slack rejects empty text payloads. Keep media-only messages media-only,
             # but send a single blank message when the bot has no text or files to send.
             if msg.content or not (msg.media or []):
                 await self._web_client.chat_postMessage(
+<<<<<<< HEAD
                     channel=target_chat_id,
+=======
+                    channel=msg.chat_id,
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                     text=self._to_mrkdwn(msg.content) if msg.content else " ",
                     thread_ts=thread_ts_param,
                 )
@@ -140,7 +166,11 @@ class SlackChannel(BaseChannel):
             for media_path in msg.media or []:
                 try:
                     await self._web_client.files_upload_v2(
+<<<<<<< HEAD
                         channel=target_chat_id,
+=======
+                        channel=msg.chat_id,
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                         file=media_path,
                         thread_ts=thread_ts_param,
                     )
@@ -150,12 +180,17 @@ class SlackChannel(BaseChannel):
             # Update reaction emoji when the final (non-progress) response is sent
             if not (msg.metadata or {}).get("_progress"):
                 event = slack_meta.get("event", {})
+<<<<<<< HEAD
                 await self._update_react_emoji(origin_chat_id, event.get("ts"))
+=======
+                await self._update_react_emoji(msg.chat_id, event.get("ts"))
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
         except Exception as e:
             logger.error("Error sending Slack message: {}", e)
             raise
 
+<<<<<<< HEAD
     async def _resolve_target_chat_id(self, target: str) -> str:
         """Resolve human-friendly Slack targets to concrete IDs when needed."""
         if not self._web_client:
@@ -267,6 +302,8 @@ class SlackChannel(BaseChannel):
         }
         return normalized in {cls._normalize_target_name(candidate) for candidate in candidates if candidate}
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     async def _on_socket_request(
         self,
         client: SocketModeClient,

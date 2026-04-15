@@ -23,6 +23,7 @@ def test_is_allowed_requires_exact_match() -> None:
 
     assert channel.is_allowed("allow@email.com") is True
     assert channel.is_allowed("attacker|allow@email.com") is False
+<<<<<<< HEAD
 
 
 def test_is_allowed_supports_dict_allow_from_alias() -> None:
@@ -35,3 +36,5 @@ def test_is_allowed_denies_empty_dict_allow_from() -> None:
     channel = _DummyChannel({"allow_from": []}, MessageBus())
 
     assert channel.is_allowed("alice") is False
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

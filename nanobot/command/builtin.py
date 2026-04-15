@@ -74,12 +74,15 @@ async def cmd_status(ctx: CommandContext) -> OutboundMessage:
             search_usage_text = usage.format()
     except Exception:
         pass  # Never let usage fetch break /status
+<<<<<<< HEAD
     active_tasks = loop._active_tasks.get(ctx.key, [])
     task_count = sum(1 for t in active_tasks if not t.done())
     try:
         task_count += loop.subagents.get_running_count_by_session(ctx.key)
     except Exception:
         pass
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     return OutboundMessage(
         channel=ctx.msg.channel,
         chat_id=ctx.msg.chat_id,
@@ -90,7 +93,10 @@ async def cmd_status(ctx: CommandContext) -> OutboundMessage:
             session_msg_count=len(session.get_history(max_messages=0)),
             context_tokens_estimate=ctx_est,
             search_usage_text=search_usage_text,
+<<<<<<< HEAD
             active_task_count=task_count,
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         ),
         metadata={**dict(ctx.msg.metadata or {}), "render_as": "text"},
     )

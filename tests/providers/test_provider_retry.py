@@ -88,6 +88,7 @@ async def test_chat_with_retry_returns_final_error_after_retries(monkeypatch) ->
 
 
 @pytest.mark.asyncio
+<<<<<<< HEAD
 async def test_chat_with_retry_emits_terminal_progress_when_standard_retries_exhaust(monkeypatch) -> None:
     provider = ScriptedProvider([
         LLMResponse(content="429 rate limit a", finish_reason="error"),
@@ -115,6 +116,8 @@ async def test_chat_with_retry_emits_terminal_progress_when_standard_retries_exh
 
 
 @pytest.mark.asyncio
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 async def test_chat_with_retry_preserves_cancelled_error() -> None:
     provider = ScriptedProvider([asyncio.CancelledError()])
 
@@ -496,6 +499,7 @@ async def test_persistent_retry_aborts_after_ten_identical_transient_errors(monk
     assert response.content == "429 rate limit"
     assert provider.calls == 10
     assert delays == [1, 2, 4, 4, 4, 4, 4, 4, 4]
+<<<<<<< HEAD
 
 
 @pytest.mark.asyncio
@@ -521,3 +525,5 @@ async def test_persistent_retry_emits_terminal_progress_on_identical_error_limit
 
     assert response.finish_reason == "error"
     assert progress[-1] == "Persistent retry stopped after 10 identical errors."
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+<<<<<<< HEAD
 import json
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 import hashlib
 import importlib.util
 import os
@@ -50,6 +53,7 @@ _DEFAULT_OPENROUTER_HEADERS = {
     "X-OpenRouter-Title": "nanobot",
     "X-OpenRouter-Categories": "cli-agent,personal-agent",
 }
+<<<<<<< HEAD
 _KIMI_THINKING_MODELS: frozenset[str] = frozenset({
     "kimi-k2.5",
     "k2.6-code-preview",
@@ -73,6 +77,8 @@ def _is_kimi_thinking_model(model_name: str) -> bool:
     if "/" in name and name.rsplit("/", 1)[1] in _KIMI_THINKING_MODELS:
         return True
     return False
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
 
 def _short_tool_id() -> str:
@@ -246,6 +252,7 @@ class OpenAICompatProvider(LLMProvider):
             return tool_call_id
         return hashlib.sha1(tool_call_id.encode()).hexdigest()[:9]
 
+<<<<<<< HEAD
     @staticmethod
     def _normalize_tool_call_arguments(arguments: Any) -> str:
         """Force function.arguments into a valid JSON object string."""
@@ -264,6 +271,8 @@ class OpenAICompatProvider(LLMProvider):
             return json.dumps(arguments, ensure_ascii=False)
         return "{}"
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     def _sanitize_messages(self, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Strip non-standard keys, normalize tool_call IDs."""
         sanitized = LLMProvider._sanitize_request_messages(messages, _ALLOWED_MSG_KEYS)
@@ -283,6 +292,7 @@ class OpenAICompatProvider(LLMProvider):
                         continue
                     tc_clean = dict(tc)
                     tc_clean["id"] = map_id(tc_clean.get("id"))
+<<<<<<< HEAD
                     function = tc_clean.get("function")
                     if isinstance(function, dict):
                         function_clean = dict(function)
@@ -293,6 +303,8 @@ class OpenAICompatProvider(LLMProvider):
                         else:
                             function_clean["arguments"] = "{}"
                         tc_clean["function"] = function_clean
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                     normalized.append(tc_clean)
                 clean["tool_calls"] = normalized
                 if clean.get("role") == "assistant":
@@ -386,6 +398,7 @@ class OpenAICompatProvider(LLMProvider):
             if extra:
                 kwargs.setdefault("extra_body", {}).update(extra)
 
+<<<<<<< HEAD
         # Model-level thinking injection for Kimi thinking-capable models.
         # Strip any provider prefix (e.g. "moonshotai/") before the set lookup
         # so that OpenRouter-style names like "moonshotai/kimi-k2.5" are handled
@@ -396,6 +409,8 @@ class OpenAICompatProvider(LLMProvider):
                 {"thinking": {"type": "enabled" if thinking_enabled else "disabled"}}
             )
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         if tools:
             kwargs["tools"] = tools
             kwargs["tool_choice"] = tool_choice or "auto"

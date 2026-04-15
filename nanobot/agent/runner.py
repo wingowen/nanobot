@@ -134,6 +134,7 @@ class AgentRunner:
                 continue
             messages.append(injection)
 
+<<<<<<< HEAD
     async def _try_drain_injections(
         self,
         spec: AgentRunSpec,
@@ -178,6 +179,8 @@ class AgentRunner:
         )
         return True, injection_cycles
 
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
     async def _drain_injections(self, spec: AgentRunSpec) -> list[dict[str, Any]]:
         """Drain pending user messages via the injection callback.
 
@@ -331,6 +334,7 @@ class AgentRunner:
                     context.error = error
                     context.stop_reason = stop_reason
                     await hook.after_iteration(context)
+<<<<<<< HEAD
                     should_continue, injection_cycles = await self._try_drain_injections(
                         spec, messages, None, injection_cycles,
                         phase="after tool error",
@@ -338,6 +342,8 @@ class AgentRunner:
                     if should_continue:
                         had_injections = True
                         continue
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                     break
                 await self._emit_checkpoint(
                     spec,
@@ -353,12 +359,25 @@ class AgentRunner:
                 empty_content_retries = 0
                 length_recovery_count = 0
                 # Checkpoint 1: drain injections after tools, before next LLM call
+<<<<<<< HEAD
                 _drained, injection_cycles = await self._try_drain_injections(
                     spec, messages, None, injection_cycles,
                     phase="after tool execution",
                 )
                 if _drained:
                     had_injections = True
+=======
+                if injection_cycles < _MAX_INJECTION_CYCLES:
+                    injections = await self._drain_injections(spec)
+                    if injections:
+                        had_injections = True
+                        injection_cycles += 1
+                        self._append_injected_messages(messages, injections)
+                        logger.info(
+                            "Injected {} follow-up message(s) after tool execution ({}/{})",
+                            len(injections), injection_cycles, _MAX_INJECTION_CYCLES,
+                        )
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 await hook.after_iteration(context)
                 continue
 
@@ -426,6 +445,7 @@ class AgentRunner:
             # Check for mid-turn injections BEFORE signaling stream end.
             # If injections are found we keep the stream alive (resuming=True)
             # so streaming channels don't prematurely finalize the card.
+<<<<<<< HEAD
             should_continue, injection_cycles = await self._try_drain_injections(
                 spec, messages, assistant_message, injection_cycles,
                 phase="after final response",
@@ -438,6 +458,38 @@ class AgentRunner:
                 await hook.on_stream_end(context, resuming=should_continue)
 
             if should_continue:
+=======
+            _injected_after_final = False
+            if injection_cycles < _MAX_INJECTION_CYCLES:
+                injections = await self._drain_injections(spec)
+                if injections:
+                    had_injections = True
+                    injection_cycles += 1
+                    _injected_after_final = True
+                    if assistant_message is not None:
+                        messages.append(assistant_message)
+                        await self._emit_checkpoint(
+                            spec,
+                            {
+                                "phase": "final_response",
+                                "iteration": iteration,
+                                "model": spec.model,
+                                "assistant_message": assistant_message,
+                                "completed_tool_results": [],
+                                "pending_tool_calls": [],
+                            },
+                        )
+                    self._append_injected_messages(messages, injections)
+                    logger.info(
+                        "Injected {} follow-up message(s) after final response ({}/{})",
+                        len(injections), injection_cycles, _MAX_INJECTION_CYCLES,
+                    )
+
+            if hook.wants_streaming():
+                await hook.on_stream_end(context, resuming=_injected_after_final)
+
+            if _injected_after_final:
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 await hook.after_iteration(context)
                 continue
 
@@ -450,6 +502,7 @@ class AgentRunner:
                 context.error = error
                 context.stop_reason = stop_reason
                 await hook.after_iteration(context)
+<<<<<<< HEAD
                 should_continue, injection_cycles = await self._try_drain_injections(
                     spec, messages, None, injection_cycles,
                     phase="after LLM error",
@@ -457,6 +510,8 @@ class AgentRunner:
                 if should_continue:
                     had_injections = True
                     continue
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 break
             if is_blank_text(clean):
                 final_content = EMPTY_FINAL_RESPONSE_MESSAGE
@@ -467,6 +522,7 @@ class AgentRunner:
                 context.error = error
                 context.stop_reason = stop_reason
                 await hook.after_iteration(context)
+<<<<<<< HEAD
                 should_continue, injection_cycles = await self._try_drain_injections(
                     spec, messages, None, injection_cycles,
                     phase="after empty response",
@@ -474,6 +530,8 @@ class AgentRunner:
                 if should_continue:
                     had_injections = True
                     continue
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
                 break
 
             messages.append(assistant_message or build_assistant_message(
@@ -510,6 +568,7 @@ class AgentRunner:
                     max_iterations=spec.max_iterations,
                 )
             self._append_final_message(messages, final_content)
+<<<<<<< HEAD
             # Drain any remaining injections so they are appended to the
             # conversation history instead of being re-published as
             # independent inbound messages by _dispatch's finally block.
@@ -521,6 +580,8 @@ class AgentRunner:
             )
             if drained_after_max_iterations:
                 had_injections = True
+=======
+>>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 
         return AgentRunResult(
             final_content=final_content,
