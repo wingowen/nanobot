@@ -308,6 +308,7 @@ class FeishuChannel(BaseChannel):
         self._loop: asyncio.AbstractEventLoop | None = None
         self._stream_bufs: dict[str, _FeishuStreamBuf] = {}
         self._bot_open_id: str | None = None
+        self._reaction_info: dict[str, dict[str, str]] = {}  # chat_id -> {message_id, reaction_id}
 
     @staticmethod
     def _register_optional_event(builder: Any, method_name: str, handler: Any) -> Any:
@@ -1302,11 +1303,24 @@ class FeishuChannel(BaseChannel):
 
         # --- stream end: final update or fallback ---
         if meta.get("_stream_end"):
-            if (message_id := meta.get("message_id")) and (reaction_id := meta.get("reaction_id")):
+            # Get message_id and reaction_id from metadata or reaction_info
+            message_id = meta.get("message_id")
+            reaction_id = meta.get("reaction_id")
+            
+            # Fallback to stored reaction info if not in metadata
+            if not message_id or not reaction_id:
+                reaction_info = self._reaction_info.get(chat_id)
+                if reaction_info:
+                    message_id = reaction_info.get("message_id")
+                    reaction_id = reaction_info.get("reaction_id")
+            
+            if message_id and reaction_id:
                 await self._remove_reaction(message_id, reaction_id)
                 # Add completion emoji if configured
-                if self.config.done_emoji and message_id:
+                if self.config.done_emoji:
                     await self._add_reaction(message_id, self.config.done_emoji)
+                # Clear stored reaction info after processing
+                self._reaction_info.pop(chat_id, None)
 
             buf = self._stream_bufs.pop(chat_id, None)
             if not buf or not buf.text:
@@ -1545,6 +1559,10 @@ class FeishuChannel(BaseChannel):
 
             # Add reaction
             reaction_id = await self._add_reaction(message_id, self.config.react_emoji)
+            
+            # Store reaction info for later removal
+            reply_to = chat_id if chat_type == "group" else sender_id
+            self._reaction_info[reply_to] = {"message_id": message_id, "reaction_id": reaction_id}
 
             # Parse content
             content_parts = []
