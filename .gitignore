@@ -16,10 +16,7 @@ __pycache__/
 *.egg
 .venv/
 venv/
-<<<<<<< HEAD
-=======
 venv-http/
->>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -88,13 +85,9 @@ logs/
 tmp/
 temp/
 *.tmp
-<<<<<<< HEAD
-=======
-*.log
 workspace/sessions/*.jsonl
 
 .nanobot/
 workspace/memory/HISTORY.md
 workspace/memory/MEMORY.md
 .nanobots/
->>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)

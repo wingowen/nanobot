@@ -260,10 +260,7 @@ class ExecTool(Tool):
             "HOME": home,
             "LANG": os.environ.get("LANG", "C.UTF-8"),
             "TERM": os.environ.get("TERM", "dumb"),
-<<<<<<< HEAD
-=======
             "C_NAME": os.environ.get("C_NAME", "default"),
->>>>>>> e01dc9e (feature(add)：新增 C_NAME 环境变量的提取；替换 nanobot 硬编码为 techclaw)
         }
         for key in self.allowed_env_keys:
             val = os.environ.get(key)
