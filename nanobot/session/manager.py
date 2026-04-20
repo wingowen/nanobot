@@ -26,18 +26,14 @@ class Session:
 
     def add_message(self, role: str, content: str, **kwargs: Any) -> None:
         """Add a message to the session."""
-        msg = {
-            "role": role,
-            "content": content,
-            "timestamp": datetime.now().isoformat(),
-            **kwargs
-        }
+        msg = {"role": role, "content": content, "timestamp": datetime.now().isoformat(), **kwargs}
         self.messages.append(msg)
         self.updated_at = datetime.now()
 
+
     def get_history(self, max_messages: int = 500) -> list[dict[str, Any]]:
         """Return unconsolidated messages for LLM input, aligned to a legal tool-call boundary."""
-        unconsolidated = self.messages[self.last_consolidated:]
+        unconsolidated = self.messages[self.last_consolidated :]
         sliced = unconsolidated[-max_messages:]
 
         # Avoid starting mid-turn when possible.
@@ -64,6 +60,7 @@ class Session:
         """Clear all messages and reset session to initial state."""
         self.messages = []
         self.last_consolidated = 0
+        self.metadata.pop("_synced_to_archive", None)
         self.updated_at = datetime.now()
 
     def retain_recent_legal_suffix(self, max_messages: int) -> None:
@@ -103,6 +100,7 @@ class SessionManager:
     def __init__(self, workspace: Path):
         self.workspace = workspace
         self.sessions_dir = ensure_dir(self.workspace / "sessions")
+        self.archive_dir = ensure_dir(self.workspace / "sessions_archive")
         self.legacy_sessions_dir = get_legacy_sessions_dir()
         self._cache: dict[str, Session] = {}
 
@@ -110,6 +108,11 @@ class SessionManager:
         """Get the file path for a session."""
         safe_key = safe_filename(key.replace(":", "_"))
         return self.sessions_dir / f"{safe_key}.jsonl"
+
+    def _get_archive_path(self, key: str) -> Path:
+        """Get the archive file path for a session."""
+        safe_key = safe_filename(key.replace(":", "_"))
+        return self.archive_dir / f"{safe_key}.jsonl"
 
     def _get_legacy_session_path(self, key: str) -> Path:
         """Legacy global session path (~/.nanobot/sessions/)."""
@@ -180,16 +183,56 @@ class SessionManager:
                 created_at=created_at or datetime.now(),
                 updated_at=updated_at or datetime.now(),
                 metadata=metadata,
-                last_consolidated=last_consolidated
+                last_consolidated=last_consolidated,
             )
         except Exception as e:
             logger.warning("Failed to load session {}: {}", key, e)
             return None
 
-    def save(self, session: Session) -> None:
-        """Save a session to disk."""
-        path = self._get_session_path(session.key)
+    def _sync_to_archive(self, session: Session) -> None:
+        """Sync session content to archive file (append-only)."""
+        archive_path = self._get_archive_path(session.key)
 
+        # Use metadata counter if available (survives /new),
+        # otherwise fall back to archive line count (backward compat).
+        synced = session.metadata.get("_synced_to_archive")
+        if synced is not None:
+            new_messages = session.messages[synced:]
+        else:
+            archive_line_count = 0
+            if archive_path.exists():
+                try:
+                    with open(archive_path, encoding="utf-8") as f:
+                        archive_line_count = sum(1 for line in f if line.strip())
+                except Exception:
+                    archive_line_count = 0
+            # If archive has more lines than session (e.g. after /new without
+            # _synced_to_archive), treat all current session messages as new.
+            if archive_line_count > len(session.messages):
+                synced = 0
+            else:
+                synced = archive_line_count
+            new_messages = session.messages[synced:]
+
+        if not new_messages:
+            return
+
+        try:
+            with open(archive_path, "a", encoding="utf-8") as f:
+                for msg in new_messages:
+                    f.write(json.dumps(msg, ensure_ascii=False) + "\n")
+            session.metadata["_synced_to_archive"] = len(session.messages)
+            logger.debug("Synced {} messages to archive {}", len(new_messages), archive_path)
+        except Exception:
+            logger.exception("Failed to sync archive {}", archive_path)
+
+    def save(self, session: Session) -> None:
+        """Save a session to disk and sync to archive."""
+        # Sync to archive before saving (archive is append-only)
+        self._sync_to_archive(session)
+
+        # Save session to disk
+        path = self._get_session_path(session.key)
         with open(path, "w", encoding="utf-8") as f:
             metadata_line = {
                 "_type": "metadata",
@@ -197,7 +240,7 @@ class SessionManager:
                 "created_at": session.created_at.isoformat(),
                 "updated_at": session.updated_at.isoformat(),
                 "metadata": session.metadata,
-                "last_consolidated": session.last_consolidated
+                "last_consolidated": session.last_consolidated,
             }
             f.write(json.dumps(metadata_line, ensure_ascii=False) + "\n")
             for msg in session.messages:
@@ -208,6 +251,38 @@ class SessionManager:
     def invalidate(self, key: str) -> None:
         """Remove a session from the in-memory cache."""
         self._cache.pop(key, None)
+
+    def delete(self, key: str) -> bool:
+        """
+        Delete a session.
+
+        Args:
+            key: Session key (usually channel:chat_id).
+
+        Returns:
+            True if deleted, False if not found.
+        """
+        self.invalidate(key)
+
+        path = self._get_session_path(key)
+        if path.exists():
+            try:
+                path.unlink()
+                return True
+            except Exception as e:
+                logger.warning("Failed to delete session {}: {}", key, e)
+                return False
+
+        legacy_path = self._get_legacy_session_path(key)
+        if legacy_path.exists():
+            try:
+                legacy_path.unlink()
+                return True
+            except Exception as e:
+                logger.warning("Failed to delete legacy session {}: {}", key, e)
+                return False
+
+        return False
 
     def list_sessions(self) -> list[dict[str, Any]]:
         """
@@ -227,12 +302,14 @@ class SessionManager:
                         data = json.loads(first_line)
                         if data.get("_type") == "metadata":
                             key = data.get("key") or path.stem.replace("_", ":", 1)
-                            sessions.append({
-                                "key": key,
-                                "created_at": data.get("created_at"),
-                                "updated_at": data.get("updated_at"),
-                                "path": str(path)
-                            })
+                            sessions.append(
+                                {
+                                    "key": key,
+                                    "created_at": data.get("created_at"),
+                                    "updated_at": data.get("updated_at"),
+                                    "path": str(path),
+                                }
+                            )
             except Exception:
                 continue
 

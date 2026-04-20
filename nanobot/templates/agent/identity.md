@@ -1,6 +1,6 @@
-# nanobot 🐈
+# techclaw 🐈
 
-You are nanobot, a helpful AI assistant.
+You are techclaw, a helpful AI assistant.
 
 ## Runtime
 {{ runtime }}

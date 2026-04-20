@@ -16,6 +16,7 @@ __pycache__/
 *.egg
 .venv/
 venv/
+venv-http/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -84,3 +85,10 @@ logs/
 tmp/
 temp/
 *.tmp
+*.log
+workspace/sessions/*.jsonl
+
+.nanobot/
+workspace/memory/HISTORY.md
+workspace/memory/MEMORY.md
+.nanobots/

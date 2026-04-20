@@ -260,6 +260,7 @@ class ExecTool(Tool):
             "HOME": home,
             "LANG": os.environ.get("LANG", "C.UTF-8"),
             "TERM": os.environ.get("TERM", "dumb"),
+            "C_NAME": os.environ.get("C_NAME", "default"),
         }
         for key in self.allowed_env_keys:
             val = os.environ.get(key)

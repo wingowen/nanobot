@@ -739,12 +739,17 @@ class AgentLoop:
         if final_content is None or not final_content.strip():
             final_content = EMPTY_FINAL_RESPONSE_MESSAGE
 
-        # Skip the already-persisted user message when saving the turn
-        save_skip = 1 + len(history) + (1 if user_persisted_early else 0)
-        self._save_turn(session, all_msgs, save_skip)
-        self._clear_pending_user_turn(session)
-        self._clear_runtime_checkpoint(session)
-        self.sessions.save(session)
+        if on_progress and final_content:
+            await on_progress(final_content)
+
+        try:
+            save_skip = 1 + len(history) + (1 if user_persisted_early else 0)
+            self._save_turn(session, all_msgs, save_skip)
+            self._clear_pending_user_turn(session)
+            self._clear_runtime_checkpoint(session)
+            self.sessions.save(session)
+        except Exception:
+            logger.exception("Error saving session {}", session.key)
         self._schedule_background(self.consolidator.maybe_consolidate_by_tokens(session))
 
         # When follow-up messages were injected mid-turn, a later natural
