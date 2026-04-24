@@ -66,8 +66,8 @@ services:
       - ./http_api:/app/http_api
       - ./.nanobot:/root/.nanobot
       - ./tests:/app/tests
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     command: bash -c "cd /app && nohup python -m nanobot gateway > /app/gateway.log 2>&1 & echo 'Gateway started' && exec python -m uvicorn http_api.main:app --host 0.0.0.0 --port 18792"
 
   nanobots:
@@ -79,13 +79,15 @@ services:
     #   - "18799:18791"
     volumes:
       - ./.nanobots:/app/.nanobots
-      - ./http_api:/app/http_api
+      # - ./http_api:/app/http_api
       - ./nanobot:/app/nanobot
-      - ./tests:/app/tests
+      # - ./tests:/app/tests
       - ./pyproject.toml:/app/pyproject.toml
       - ./start_gateway.sh:/app/start_gateway.sh
       - ./logs:/app/logs
-    env_file:
-      - .env
+      - ./supervisord.conf:/app/supervisord.conf
+
+    # env_file:
+    #   - .env
     # command: bash -c "cd /app python -m nan python -m nanobot gateway > /app/gateway.log 2>&1 & echo 'Gateway started' && exec python -m uvicorn http_api.main:app --host 0.0.0.0 --port 18792"
     command: bash -c "pip install --no-cache-dir -e . && tail -f /dev/null"
